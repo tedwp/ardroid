@@ -7,6 +7,12 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+/**
+ * Clase para principal para la prueba de filtros de reducción de ruido (Kalman
+ * y promedios)
+ * @author Sebastián García Anderman
+ *
+ */
 public class ARDroidSensorNoiseFilterTest extends Activity {
 
 	public static volatile Context context;
