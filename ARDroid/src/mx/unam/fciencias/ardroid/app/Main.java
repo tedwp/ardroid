@@ -1,4 +1,4 @@
-package mx.unam.fciencias;
+package mx.unam.fciencias.ardroid.app;
 
 import android.app.Activity;
 import android.content.Context;
