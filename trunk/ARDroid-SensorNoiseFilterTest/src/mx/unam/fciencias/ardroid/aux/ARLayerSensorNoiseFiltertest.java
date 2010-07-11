@@ -1,5 +1,6 @@
-package mx.unam.fciencias;
+package mx.unam.fciencias.ardroid.aux;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -61,7 +62,17 @@ public class ARLayerSensorNoiseFiltertest extends View {
 
 	boolean kalman, average;
 
-	public ARLayerSensorNoiseFiltertest(Context context) {
+	PrintWriter kDirWriter;
+	PrintWriter aDirWriter;
+	PrintWriter rDirWriter;
+	PrintWriter kIncWriter;
+	PrintWriter aIncWriter;
+	PrintWriter rIncWriter;
+
+	public ARLayerSensorNoiseFiltertest(Context context,
+			PrintWriter kDirPW, PrintWriter aDirPW,
+			PrintWriter rDirPW, PrintWriter kIncPW,
+			PrintWriter aIncPW, PrintWriter rIncPW) {
 		super(context);
 
 		average = true;
@@ -91,6 +102,12 @@ public class ARLayerSensorNoiseFiltertest extends View {
 				avgRollingX.add(0f);
 			}
 		}
+		kDirWriter = kDirPW;
+		aDirWriter =aDirPW;
+		rDirWriter = rDirPW;
+		kIncWriter = kIncPW;
+		aIncWriter = aIncPW;
+		rIncWriter = rIncPW;
 
 	}
 
@@ -126,10 +143,17 @@ public class ARLayerSensorNoiseFiltertest extends View {
 						kalLocalDirection = kalDirection;
 					}
 					textKdirection = "dir K: " + (int) kalLocalDirection;
+					kDirWriter.print(kalLocalDirection);
+					kDirWriter.flush();
 				}
 				// Valores reales de los sensores
 				textRDirection = "realD: " + event.values[0];
 				textRInclination = "realI: " + (90 - event.values[2]);
+
+				rDirWriter.print(event.values[0]);
+				rIncWriter.print((90 - event.values[2]));
+				rDirWriter.flush();
+				rIncWriter.flush();
 
 				if (average) {
 					tmpDirection = event.values[0];
@@ -152,6 +176,7 @@ public class ARLayerSensorNoiseFiltertest extends View {
 
 					directions.remove(0);
 					textAdirection = "dir A: " + (int) avgLocalDirection;
+					aDirWriter.print(avgLocalDirection);
 				}
 			}
 
@@ -180,6 +205,8 @@ public class ARLayerSensorNoiseFiltertest extends View {
 						kalInclination = kalInclination - 90;
 					}
 					textKinclination = "inc K: " + (int) kalInclination;
+					kIncWriter.print(kalInclination);
+					kIncWriter.flush();
 				}
 
 				if (average) {
@@ -228,6 +255,7 @@ public class ARLayerSensorNoiseFiltertest extends View {
 						avgInclination = avgInclination - 90;
 					}
 					textAInclination = "inc A: " + (int) avgInclination;
+					aIncWriter.print(avgInclination);
 
 					{
 						++cont;
