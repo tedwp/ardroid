@@ -27,12 +27,12 @@ public class ARDroidSensorNoiseFilterTest extends Activity {
 	public static volatile Context context;
 	public ARLayerSensorNoiseFiltertest arLayer;
 
-	String kDirFileString = "kDirFile";
-	String aDirFileString = "aDirFile";
-	String rDirFileString = "rDirFile";
-	String kIncFileString = "kIncFile";
-	String aIncFileString = "aIncFile";
-	String rIncFileString = "rIncFile";
+	String kDirFileString = "dropbox/Eris/kDirFile.txt";
+	String aDirFileString = "dropbox/Eris/aDirFile.txt";
+	String rDirFileString = "dropbox/Eris/rDirFile.txt";
+	String kIncFileString = "dropbox/Eris/kIncFile.txt";
+	String aIncFileString = "dropbox/Eris/aIncFile.txt";
+	String rIncFileString = "dropbox/Eris/rIncFile.txt";
 
 	PrintWriter kDirPW;
 	PrintWriter aDirPW;
