@@ -19,7 +19,7 @@ import android.view.View;
  * Clase para probar dos tipos de filtros (Kalman y promedios) sobre los datos
  * de los sensores del teléfono
  *
- * @author lander
+ * @author Sebastián García Anderman
  *
  */
 public class ARLayerSensorNoiseFiltertest extends View {
@@ -144,6 +144,7 @@ public class ARLayerSensorNoiseFiltertest extends View {
 					}
 					textKdirection = "dir K: " + (int) kalLocalDirection;
 					kDirWriter.print(kalLocalDirection);
+					kDirWriter.println();
 					kDirWriter.flush();
 				}
 				// Valores reales de los sensores
@@ -152,6 +153,8 @@ public class ARLayerSensorNoiseFiltertest extends View {
 
 				rDirWriter.print(event.values[0]);
 				rIncWriter.print((90 - event.values[2]));
+				rDirWriter.println();
+				rIncWriter.println();
 				rDirWriter.flush();
 				rIncWriter.flush();
 
@@ -177,6 +180,8 @@ public class ARLayerSensorNoiseFiltertest extends View {
 					directions.remove(0);
 					textAdirection = "dir A: " + (int) avgLocalDirection;
 					aDirWriter.print(avgLocalDirection);
+					aDirWriter.println();
+					aDirWriter.flush();
 				}
 			}
 
@@ -206,6 +211,7 @@ public class ARLayerSensorNoiseFiltertest extends View {
 					}
 					textKinclination = "inc K: " + (int) kalInclination;
 					kIncWriter.print(kalInclination);
+					kIncWriter.println();
 					kIncWriter.flush();
 				}
 
@@ -256,6 +262,8 @@ public class ARLayerSensorNoiseFiltertest extends View {
 					}
 					textAInclination = "inc A: " + (int) avgInclination;
 					aIncWriter.print(avgInclination);
+					aIncWriter.println();
+					aIncWriter.flush();
 
 					{
 						++cont;
