@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.location.Location;
 import android.view.View;
 
+// TODO: Auto-generated Javadoc
 /**
  * Clase que representa un punto de interés (POI Point of Interest).
  *
@@ -15,25 +16,29 @@ public class POI extends View {
 	/** Ubicación del POI. */
 	private Location location;
 
-	/** Ubicación del dispositivo */
+	/** Ubicación del dispositivo. */
 	public static Location deviceLocation;
 
-	/** distancia entre el dispositivo y el POI */
+	/** distancia entre el dispositivo y el POI. */
 	private float distance;
 
-	/** grados hacia el Este desde el Norte entre el dispositivo y el POI */
+	/** grados hacia el Este desde el Norte entre el dispositivo y el POI. */
 	private float azimuth;
 
-	/** inclinación del dispositivo al POI, se obtiene con la altitud */
+	/** inclinación del dispositivo al POI, se obtiene con la altitud. */
 	private float inclination = 0;
 
+	/** The name. */
 	private String name;
+
+	/** The source. */
 	private String source;
 
 	/**
+	 * Instantiates a new pOI.
 	 *
-	 * @param location
-	 * @param deviceLocation
+	 * @param location the location
+	 * @param deviceLocation the device location
 	 */
 	public POI(Location location, Location deviceLocation) {
 		super(Main.context);
@@ -68,6 +73,8 @@ public class POI extends View {
 
 	/**
 	 * Dibujamos este POI.
+	 *
+	 * @param canvas the canvas
 	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -76,6 +83,8 @@ public class POI extends View {
 	}
 
 	/**
+	 * Gets the location.
+	 *
 	 * @return the location
 	 */
 	public Location getLocation() {
@@ -83,14 +92,17 @@ public class POI extends View {
 	}
 
 	/**
-	 * @param location
-	 *            the location to set
+	 * Sets the location.
+	 *
+	 * @param location the location to set
 	 */
 	public void setLocation(Location location) {
 		this.location = location;
 	}
 
 	/**
+	 * Gets the distance.
+	 *
 	 * @return the distance
 	 */
 	public float getDistance() {
@@ -98,14 +110,17 @@ public class POI extends View {
 	}
 
 	/**
-	 * @param distance
-	 *            the distance to set
+	 * Sets the distance.
+	 *
+	 * @param distance the distance to set
 	 */
 	public void setDistance(float distance) {
 		this.distance = distance;
 	}
 
 	/**
+	 * Gets the azimuth.
+	 *
 	 * @return the azimuth
 	 */
 	public float getAzimuth() {
@@ -113,14 +128,17 @@ public class POI extends View {
 	}
 
 	/**
-	 * @param azimuth
-	 *            the azimuth to set
+	 * Sets the azimuth.
+	 *
+	 * @param azimuth the azimuth to set
 	 */
 	public void setAzimuth(float azimuth) {
 		this.azimuth = azimuth;
 	}
 
 	/**
+	 * Gets the inclination.
+	 *
 	 * @return the inclination
 	 */
 	public float getInclination() {
@@ -128,33 +146,64 @@ public class POI extends View {
 	}
 
 	/**
-	 * @param inclination
-	 *            the inclination to set
+	 * Sets the inclination.
+	 *
+	 * @param inclination the inclination to set
 	 */
 	public void setInclination(float inclination) {
 		this.inclination = inclination;
 	}
 
+	/**
+	 * Sets the device location.
+	 *
+	 * @param deviceLocation the new device location
+	 */
 	public void setDeviceLocation(Location deviceLocation) {
 		POI.deviceLocation = deviceLocation;
 	}
 
+	/**
+	 * Gets the device location.
+	 *
+	 * @return the device location
+	 */
 	public Location getDeviceLocation() {
 		return deviceLocation;
 	}
 
+	/**
+	 * Sets the source.
+	 *
+	 * @param source the new source
+	 */
 	public void setSource(String source) {
 		this.source = source;
 	}
 
+	/**
+	 * Gets the source.
+	 *
+	 * @return the source
+	 */
 	public String getSource() {
 		return source;
 	}
 
+	/**
+	 * Sets the name.
+	 *
+	 * @param name the new name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}

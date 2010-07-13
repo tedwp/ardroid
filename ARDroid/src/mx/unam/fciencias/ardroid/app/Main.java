@@ -25,10 +25,17 @@ public class Main extends Activity {
 	 */
 	public static volatile Context context;
 
+	/** Vista previa de la cámara. */
 	private CameraPreview cameraPreview;
+
+	/** Capa que se encargará de manejar los POI. */
 	private ARLayer arLayer;
 
-	/** Se llama cuando la actividad se crea por primera vez. */
+	/**
+	 * Se llama cuando la actividad se crea por primera vez.
+	 *
+	 * @param savedInstanceState the saved instance state
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
