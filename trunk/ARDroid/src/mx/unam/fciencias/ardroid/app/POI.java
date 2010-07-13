@@ -1,31 +1,34 @@
 package mx.unam.fciencias.ardroid.app;
 
+import android.graphics.Canvas;
 import android.location.Location;
+import android.view.View;
 
 /**
- * Clase que representa un punto de interés (POI Point of Interest)
+ * Clase que representa un punto de interés (POI Point of Interest).
  *
  * @author Sebastián García Anderman
  *
  */
-public class POI {
+public class POI extends View {
 
-	private Location location;// Ubicación del POI
-	public static Location deviceLocation;// Ubicación del dispositivo
+	/** Ubicación del POI. */
+	private Location location;
 
-	// distancia entre el dispositivo y el POI
+	/** Ubicación del dispositivo */
+	public static Location deviceLocation;
+
+	/** distancia entre el dispositivo y el POI */
 	private float distance;
 
-	// grados hacia el Este desde el Norte entre el dispositivo y el POI
+	/** grados hacia el Este desde el Norte entre el dispositivo y el POI */
 	private float azimuth;
 
-	// inclinación del dispositivo al POI, se obtiene con la altitud
+	/** inclinación del dispositivo al POI, se obtiene con la altitud */
 	private float inclination = 0;
 
 	private String name;
 	private String source;
-
-
 
 	/**
 	 *
@@ -33,6 +36,7 @@ public class POI {
 	 * @param deviceLocation
 	 */
 	public POI(Location location, Location deviceLocation) {
+		super(Main.context);
 		this.location = location;
 		this.setDeviceLocation(deviceLocation);
 		azimuth = deviceLocation.bearingTo(location);
@@ -60,6 +64,15 @@ public class POI {
 			}
 		}
 
+	}
+
+	/**
+	 * Dibujamos este POI.
+	 */
+	@Override
+	protected void onDraw(Canvas canvas) {
+		// TODO Auto-generated method stub
+		super.onDraw(canvas);
 	}
 
 	/**
