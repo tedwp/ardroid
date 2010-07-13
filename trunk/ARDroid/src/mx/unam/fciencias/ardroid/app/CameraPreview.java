@@ -3,13 +3,13 @@ package mx.unam.fciencias.ardroid.app;
 import java.io.IOException;
 import java.util.List;
 
-import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+// TODO: Auto-generated Javadoc
 /**
  * Clase que implementa la vista previa de la cámara del dispositivo.
  *
@@ -18,9 +18,15 @@ import android.view.SurfaceView;
 public class CameraPreview extends SurfaceView implements
 		SurfaceHolder.Callback {
 
+	/** The surface holder. */
 	SurfaceHolder surfaceHolder;
+
+	/** The camera. */
 	Camera camera;
 
+	/**
+	 * Instantiates a new camera preview.
+	 */
 	CameraPreview() {
 		super(Main.context);
 
@@ -31,6 +37,9 @@ public class CameraPreview extends SurfaceView implements
 		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 	}
 
+	/* (non-Javadoc)
+	 * @see android.view.SurfaceHolder.Callback#surfaceCreated(android.view.SurfaceHolder)
+	 */
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		// The Surface has been created, acquire the camera and tell it where
@@ -45,6 +54,9 @@ public class CameraPreview extends SurfaceView implements
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see android.view.SurfaceHolder.Callback#surfaceDestroyed(android.view.SurfaceHolder)
+	 */
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// Surface will be destroyed when we return, so stop the preview.
@@ -55,6 +67,14 @@ public class CameraPreview extends SurfaceView implements
 		camera = null;
 	}
 
+	/**
+	 * Gets the optimal preview size.
+	 *
+	 * @param sizes the sizes
+	 * @param w the w
+	 * @param h the h
+	 * @return the optimal preview size
+	 */
 	private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
 		final double ASPECT_TOLERANCE = 0.05;
 		double targetRatio = (double) w / h;
@@ -92,6 +112,9 @@ public class CameraPreview extends SurfaceView implements
 		return optimalSize;
 	}
 
+	/* (non-Javadoc)
+	 * @see android.view.SurfaceHolder.Callback#surfaceChanged(android.view.SurfaceHolder, int, int, int)
+	 */
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		// Now that the size is known, set up the camera parameters and begin

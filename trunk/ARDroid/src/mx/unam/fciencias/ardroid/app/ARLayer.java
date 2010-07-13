@@ -15,19 +15,29 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 
+// TODO: Auto-generated Javadoc
 /**
- * Clase que define la capa de realidad aumentada
+ * Clase que define la capa de realidad aumentada.
  *
  * @author Sebastián García Anderman
- *
  */
 public class ARLayer extends View {
 
+	/** The direction. */
 	private float direction;
+
+	/** The inclination. */
 	private float inclination;
+
+	/** The current location. */
 	private Location currentLocation;
+
+	/** The location changed. */
 	private boolean locationChanged = false;;
 
+	/**
+	 * Instantiates a new aR layer.
+	 */
 	public ARLayer() {
 		super(Main.context);
 		initSensors();
@@ -80,10 +90,14 @@ public class ARLayer extends View {
 				SensorManager.SENSOR_DELAY_GAME);
 	}
 
+	/**
+	 * Inits the draw components.
+	 */
 	private void initDrawComponents() {
 
 	}
 
+	/** The orientation listener. */
 	final SensorEventListener orientationListener = new SensorEventListener() {
 
 		private float tmpDirection;
@@ -212,9 +226,7 @@ public class ARLayer extends View {
 		}
 	};
 
-	/**
-	 * Escucha para el cambio de ubicación
-	 */
+	/** Escucha para el cambio de ubicación. */
 	private final LocationListener locationListener = new LocationListener() {
 		@Override
 		public void onLocationChanged(Location location) {
@@ -238,14 +250,11 @@ public class ARLayer extends View {
 	};
 
 	/**
-	 * Método para calcular la posición en pantalla de cada uno de los POI
+	 * Método para calcular la posición en pantalla de cada uno de los POI.
 	 *
-	 * @param direction
-	 *            Dirección del dispositivo
-	 * @param inclination
-	 *            Inclinación del dispositivo
-	 * @param location
-	 *            Ubicación del dispositivo
+	 * @param direction Dirección del dispositivo
+	 * @param inclination Inclinación del dispositivo
+	 * @param location Ubicación del dispositivo
 	 */
 	private void updatePOILayout(float direction, float inclination,
 			Location location) {
@@ -254,7 +263,9 @@ public class ARLayer extends View {
 
 	/**
 	 * Método que dibuja esta vista cuando se llama a <code>invalidate()</code>
-	 * o <code>postInvalidate()</code>
+	 * o <code>postInvalidate()</code>.
+	 *
+	 * @param canvas the canvas
 	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -263,6 +274,8 @@ public class ARLayer extends View {
 	}
 
 	/**
+	 * Gets the direction.
+	 *
 	 * @return the direction
 	 */
 	public float getDirection() {
@@ -270,6 +283,8 @@ public class ARLayer extends View {
 	}
 
 	/**
+	 * Gets the inclination.
+	 *
 	 * @return the inclination
 	 */
 	public float getInclination() {
