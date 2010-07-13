@@ -52,8 +52,8 @@ public class Main extends Activity {
 	 * Inicializamos los diferentes componentes del programa.
 	 */
 	private void initComponents() {
-		cameraPreview = new CameraPreview(context);
-		arLayer = new ARLayer(context);
+		cameraPreview = new CameraPreview();
+		arLayer = new ARLayer();
 	}
 
 	/**

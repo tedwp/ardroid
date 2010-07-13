@@ -25,9 +25,11 @@ public class ARLayer extends View {
 
 	private float direction;
 	private float inclination;
+	private Location currentLocation;
+	private boolean locationChanged = false;;
 
-	public ARLayer(Context context) {
-		super(context);
+	public ARLayer() {
+		super(Main.context);
 		initSensors();
 		initGPS();
 		initDrawComponents();
@@ -86,6 +88,7 @@ public class ARLayer extends View {
 
 		private float tmpDirection;
 		private float avgLocalDirection;
+		private float prevAvgLocalDirection = 0;
 		private float avgSum;
 		private ArrayList<Float> directions = new ArrayList<Float>();
 
@@ -94,12 +97,19 @@ public class ARLayer extends View {
 		private ArrayList<Float> avgRollingZ = new ArrayList<Float>();
 		private ArrayList<Float> avgRollingX = new ArrayList<Float>();
 		private float avgInclination;
+		private float prevAvgInclination = 0;
+
+		private boolean directionChanged = false;
+		private boolean inclinationChanged = false;
 
 		// Usamos un filtro de promedios con las últimas <code>AVG_NUM</code>
 		// lecturas de los sensores para determinar la nueva dirección e
 		// inclinación del teléfono. Hacemos esto para filtrar el ruido de los
 		// sensores.
-		protected static final int AVG_NUM = 8;
+		private static final int AVG_NUM = 8;
+
+		private static final float DIRECTION_THRESHOLD = 0;
+		private static final float LOCATION_THRESHOLD = 0;
 
 		@Override
 		public void onSensorChanged(SensorEvent event) {
@@ -123,6 +133,10 @@ public class ARLayer extends View {
 				directions.add(avgLocalDirection);
 				avgLocalDirection = avgSum / AVG_NUM;
 				directions.remove(0);
+				if (Math.abs(prevAvgLocalDirection - avgLocalDirection) > DIRECTION_THRESHOLD) {
+					directionChanged = true;
+				}
+				prevAvgLocalDirection = avgLocalDirection;
 			}
 
 			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -169,11 +183,26 @@ public class ARLayer extends View {
 					avgInclination = avgInclination - 90;
 				}
 				// avgInclination es la inclinación final
+
+				if (Math.abs(prevAvgInclination - avgInclination) > LOCATION_THRESHOLD) {
+					inclinationChanged = true;
+				}
+				prevAvgInclination = avgInclination;
 			}
 
-			// realizar optimización guardando los datos anteriores y solo
-			// actualizando la UI si esos valores cambian
-			postInvalidate();
+			// definir el threshold
+			if (directionChanged || inclinationChanged) {
+				if (locationChanged) {
+					updatePOILayout(avgLocalDirection, avgInclination,
+							currentLocation);
+					locationChanged = false;
+				} else {
+					updatePOILayout(avgLocalDirection, avgInclination, null);
+				}
+				directionChanged = false;
+				inclinationChanged = false;
+				postInvalidate();
+			}
 
 		}
 
@@ -183,10 +212,14 @@ public class ARLayer extends View {
 		}
 	};
 
+	/**
+	 * Escucha para el cambio de ubicación
+	 */
 	private final LocationListener locationListener = new LocationListener() {
 		@Override
 		public void onLocationChanged(Location location) {
-
+			currentLocation = location;
+			locationChanged = true;
 		}
 
 		@Override
@@ -203,6 +236,21 @@ public class ARLayer extends View {
 
 		}
 	};
+
+	/**
+	 * Método para calcular la posición en pantalla de cada uno de los POI
+	 *
+	 * @param direction
+	 *            Dirección del dispositivo
+	 * @param inclination
+	 *            Inclinación del dispositivo
+	 * @param location
+	 *            Ubicación del dispositivo
+	 */
+	private void updatePOILayout(float direction, float inclination,
+			Location location) {
+
+	}
 
 	/**
 	 * Método que dibuja esta vista cuando se llama a <code>invalidate()</code>
