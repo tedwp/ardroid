@@ -8,12 +8,17 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.view.View;
 
 /**
  * Clase que define la capa de realidad aumentada
  *
- * @author lander
+ * @author Sebastián García Anderman
  *
  */
 public class ARLayer extends View {
@@ -24,17 +29,53 @@ public class ARLayer extends View {
 	public ARLayer(Context context) {
 		super(context);
 		initSensors();
-
+		initGPS();
+		initDrawComponents();
 	}
 
+	/**
+	 * Iniciamos el servicio de GPS y su escucha, solicitamos actualización de
+	 * la ubicación cada 30 segundos o cuando el dispositivo se mueva más de 5
+	 * metros. En general importa actualizar el valor solo si se ha cambiado de
+	 * posición.
+	 *
+	 * Solicitamos que el proveedor de ubicación tenga una precisión fina, esto
+	 * significa utilizar el GPS pero no solicitamos ese proveedor directamente
+	 * para seguir las convenciones de Android.
+	 */
+	private void initGPS() {
+		LocationManager locationManager;
+		String context = Context.LOCATION_SERVICE;
+		locationManager = (LocationManager) Main.context
+				.getSystemService(context);
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		criteria.setBearingRequired(true);
+		criteria.setCostAllowed(true);
+		String provider = locationManager.getBestProvider(criteria, true);
+		locationManager.requestLocationUpdates(provider, 30000, 5,
+				locationListener);
+	}
+
+	/**
+	 * Iniciamos los sensores, de orientación y el acelerómetro. Pedimos que nos
+	 * dé actualizaciones con <code>SensorManager.SENSOR_DELAY_GAME</code> que
+	 * es el segundo más rápido y promedia 60 actualizaciones por segundo en un
+	 * Droid Eris.
+	 *
+	 * Sería suficiente tener 30 actualizaciones por segundo, pero como estamos
+	 * a la escucha de dos sensores diferentes, así nos da en promedio 30
+	 * actualizaciones de cada sensor por segundo.
+	 */
 	private void initSensors() {
 		SensorManager sm = (SensorManager) Main.context
 				.getSystemService(Context.SENSOR_SERVICE);
-		int sensorType = Sensor.TYPE_ORIENTATION;
 		sm.registerListener(orientationListener,
-				sm.getDefaultSensor(sensorType),
-				SensorManager.SENSOR_DELAY_FASTEST);
-		initDrawComponents();
+				sm.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+				SensorManager.SENSOR_DELAY_GAME);
+		sm.registerListener(orientationListener,
+				sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+				SensorManager.SENSOR_DELAY_GAME);
 	}
 
 	private void initDrawComponents() {
@@ -130,6 +171,8 @@ public class ARLayer extends View {
 				// avgInclination es la inclinación final
 			}
 
+			// realizar optimización guardando los datos anteriores y solo
+			// actualizando la UI si esos valores cambian
 			postInvalidate();
 
 		}
@@ -137,6 +180,27 @@ public class ARLayer extends View {
 		@Override
 		public void onAccuracyChanged(Sensor arg0, int arg1) {
 			// No necesitamos hacer nada aquí
+		}
+	};
+
+	private final LocationListener locationListener = new LocationListener() {
+		@Override
+		public void onLocationChanged(Location location) {
+
+		}
+
+		@Override
+		public void onProviderDisabled(String provider) {
+
+		}
+
+		@Override
+		public void onProviderEnabled(String provider) {
+		}
+
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+
 		}
 	};
 

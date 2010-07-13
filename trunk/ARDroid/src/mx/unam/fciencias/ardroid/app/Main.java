@@ -9,6 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 /**
+ * Actividad principal de la aplicación.
  *
  * @author Sebastián García Anderman
  */
@@ -19,7 +20,8 @@ public class Main extends Activity {
 	 * hacemos de tipo volatile para que se guarde en el caché local y estático
 	 * para poder accederlo fácilmente desde cualquier clase. Fuente:
 	 * http://www.
-	 * hasemanonmobile.com/2009/10/05/quick-and-very-dirty-android-development-trick/
+	 * hasemanonmobile.com/2009/10/05/quick-and-very-dirty-android-development
+	 * -trick/
 	 */
 	public static volatile Context context;
 

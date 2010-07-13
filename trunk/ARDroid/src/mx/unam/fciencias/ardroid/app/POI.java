@@ -11,7 +11,7 @@ import android.location.Location;
 public class POI {
 
 	private Location location;// Ubicación del POI
-	private Location deviceLocation;// Ubicación del dispositivo
+	public static Location deviceLocation;// Ubicación del dispositivo
 
 	// distancia entre el dispositivo y el POI
 	private float distance;
@@ -21,6 +21,11 @@ public class POI {
 
 	// inclinación del dispositivo al POI, se obtiene con la altitud
 	private float inclination = 0;
+
+	private String name;
+	private String source;
+
+
 
 	/**
 	 *
@@ -32,21 +37,27 @@ public class POI {
 		this.setDeviceLocation(deviceLocation);
 		azimuth = deviceLocation.bearingTo(location);
 		distance = deviceLocation.distanceTo(location);
-		if (deviceLocation.hasAccuracy() && location.hasAltitude()) {
-			double opposite;
-			boolean neg = false;
+
+		// Calculamos la inclinación a la que está el POI con respecto a nuestra
+		// ubicación
+		if (deviceLocation.hasAltitude() && location.hasAltitude()) {
+			double altitudeDiff;
+			boolean negative = false;
 			if (location.getAltitude() > deviceLocation.getAltitude()) {
-				opposite = location.getAltitude()
+				altitudeDiff = location.getAltitude()
 						- deviceLocation.getAltitude();
 			} else {
-				opposite = deviceLocation.getAltitude()
+				altitudeDiff = deviceLocation.getAltitude()
 						- location.getAltitude();
-				neg = true;
+				negative = true;
 			}
-			setInclination((float) Math
-					.atan(((double) opposite / getDistance())));
-			if (neg)
-				setInclination(getInclination() * -1);
+			if (negative) {
+				inclination = (float) (Math
+						.atan(((double) altitudeDiff / distance)) * -1);
+			} else {
+				inclination = (float) Math.atan((double) altitudeDiff
+						/ distance);
+			}
 		}
 
 	}
@@ -112,11 +123,27 @@ public class POI {
 	}
 
 	public void setDeviceLocation(Location deviceLocation) {
-		this.deviceLocation = deviceLocation;
+		POI.deviceLocation = deviceLocation;
 	}
 
 	public Location getDeviceLocation() {
 		return deviceLocation;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 }
