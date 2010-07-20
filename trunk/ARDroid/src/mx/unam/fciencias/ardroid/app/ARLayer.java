@@ -1,6 +1,8 @@
 package mx.unam.fciencias.ardroid.app;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,7 +15,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -35,14 +39,36 @@ public class ARLayer extends View {
 	/** The location changed. */
 	private boolean locationChanged = false;;
 
+	private int screenWidth;
+	private int screenHeight;
+
+	/** Lista de POI */
+	private List<POI> poiList;
+
+	private static final float CAMERA_ANGLE_HORIZONTAL = 49.55f;
+	private static final float CAMERA_ANGLE_VERTICAL = 34.2f;
+
+	private static final float CAMERA_ANGLE_HORIZONTAL_HALF = CAMERA_ANGLE_HORIZONTAL / 2;
+	private static final float CAMERA_ANGLE_VERTICAL_HALF = CAMERA_ANGLE_VERTICAL / 2;
+
 	/**
-	 * Instantiates a new aR layer.
+	 * Constructor
 	 */
 	public ARLayer() {
 		super(Main.context);
+		initLayout();
 		initSensors();
 		initGPS();
 		initDrawComponents();
+		poiList = java.util.Collections.synchronizedList(new ArrayList<POI>());
+		// TODO: Checar si necesita ser synchronized o no hace falta.
+	}
+
+	private void initLayout() {
+		Display display = ((WindowManager) Main.context
+				.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		screenHeight = display.getHeight();
+		screenWidth = display.getWidth();
 	}
 
 	/**
@@ -123,7 +149,7 @@ public class ARLayer extends View {
 		private static final int AVG_NUM = 8;
 
 		private static final float DIRECTION_THRESHOLD = 0;
-		private static final float LOCATION_THRESHOLD = 0;
+		private static final float INCLINATION_THRESHOLD = 0;
 
 		@Override
 		public void onSensorChanged(SensorEvent event) {
@@ -147,7 +173,8 @@ public class ARLayer extends View {
 				directions.add(avgLocalDirection);
 				avgLocalDirection = avgSum / AVG_NUM;
 				directions.remove(0);
-				if (Math.abs(prevAvgLocalDirection - avgLocalDirection) > DIRECTION_THRESHOLD) {
+				if (changeAboveThreshold(prevAvgLocalDirection,
+						avgLocalDirection, DIRECTION_THRESHOLD)) {
 					directionChanged = true;
 				}
 				prevAvgLocalDirection = avgLocalDirection;
@@ -198,7 +225,8 @@ public class ARLayer extends View {
 				}
 				// avgInclination es la inclinación final
 
-				if (Math.abs(prevAvgInclination - avgInclination) > LOCATION_THRESHOLD) {
+				if (changeAboveThreshold(prevAvgInclination, avgInclination,
+						INCLINATION_THRESHOLD)) {
 					inclinationChanged = true;
 				}
 				prevAvgInclination = avgInclination;
@@ -226,6 +254,21 @@ public class ARLayer extends View {
 		}
 	};
 
+	/**
+	 * Calculamos si la diferencia entre ambos valores está arriba de cierto
+	 * umbral. Usamos este método ya que a veces el cambio de dirección o
+	 * inclinación es mínimo y no necesitamos recalcular la posición de los POI.
+	 *
+	 * @param val1		Primer valor
+	 * @param val2		Segundo valor
+	 * @param threshold	Umbral
+	 * @return Verdadero si la diferencia entre <code>val1</code> y
+	 *         <code>val2</code> es mayor que <code>threshold</code>
+	 */
+	private boolean changeAboveThreshold(float val1, float val2, float threshold) {
+		return Math.abs(val1 - val2) > threshold;
+	}
+
 	/** Escucha para el cambio de ubicación. */
 	private final LocationListener locationListener = new LocationListener() {
 		@Override
@@ -249,23 +292,79 @@ public class ARLayer extends View {
 		}
 	};
 
+	private float leftArm() {
+		float la = direction - CAMERA_ANGLE_HORIZONTAL_HALF;
+		if (la < 0) {
+			la += 360;
+		}
+		return la;
+	}
+
+	private float rightArm() {
+		float ra = direction + CAMERA_ANGLE_HORIZONTAL_HALF;
+		if (ra > 360) {
+			ra -= 360;
+		}
+		return ra;
+	}
+
+	private float xPosition(float dir) {
+		float x = -1;
+		float la = leftArm();
+		float ra = rightArm();
+		if (la > ra) {
+			if (dir >= la) {
+				x = dir - la;
+			} else {
+				x = 360 - la + dir;
+			}
+		} else {
+			x = dir - la;
+		}
+		return (x * screenWidth) / CAMERA_ANGLE_HORIZONTAL;
+	}
+
+	private float upperArm() {
+		// TODO
+		return 0;
+	}
+
+	private float lowerArm() {
+		// TODO
+		return 0;
+	}
+
+	private float yPosition(float inc) {
+		// TODO
+		return screenHeight / 2;
+	}
+
 	/**
 	 * Método para calcular la posición en pantalla de cada uno de los POI.
 	 *
-	 * @param direction Dirección del dispositivo
-	 * @param inclination Inclinación del dispositivo
-	 * @param location Ubicación del dispositivo
+	 * @param direction		Dirección del dispositivo
+	 * @param inclination	Inclinación del dispositivo
+	 * @param location		Ubicación del dispositivo
 	 */
 	private void updatePOILayout(float direction, float inclination,
 			Location location) {
+		Iterator<POI> poiIterator = poiList.iterator();
+		while (poiIterator.hasNext()) {
+			POI poi = poiIterator.next();
 
+			// Calculamos la posición en x y en y de este POI y redondeamos al
+			// entero
+			// más cercano
+			int x = Math.round(xPosition(poi.getAzimuth()));
+			int y = Math.round(yPosition(poi.getInclination()));
+		}
 	}
 
 	/**
 	 * Método que dibuja esta vista cuando se llama a <code>invalidate()</code>
 	 * o <code>postInvalidate()</code>.
 	 *
-	 * @param canvas the canvas
+	 * @param canvas	The canvas
 	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
