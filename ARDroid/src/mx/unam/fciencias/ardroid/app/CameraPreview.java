@@ -1,13 +1,13 @@
 package mx.unam.fciencias.ardroid.app;
 
-import java.io.IOException;
-import java.util.List;
-
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.io.IOException;
+import java.util.List;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -40,7 +40,6 @@ public class CameraPreview extends SurfaceView implements
 	/* (non-Javadoc)
 	 * @see android.view.SurfaceHolder.Callback#surfaceCreated(android.view.SurfaceHolder)
 	 */
-	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		// The Surface has been created, acquire the camera and tell it where
 		// to draw.
@@ -57,7 +56,6 @@ public class CameraPreview extends SurfaceView implements
 	/* (non-Javadoc)
 	 * @see android.view.SurfaceHolder.Callback#surfaceDestroyed(android.view.SurfaceHolder)
 	 */
-	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// Surface will be destroyed when we return, so stop the preview.
 		// Because the CameraDevice object is not a shared resource, it's very
@@ -115,7 +113,6 @@ public class CameraPreview extends SurfaceView implements
 	/* (non-Javadoc)
 	 * @see android.view.SurfaceHolder.Callback#surfaceChanged(android.view.SurfaceHolder, int, int, int)
 	 */
-	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		// Now that the size is known, set up the camera parameters and begin
 		// the preview.

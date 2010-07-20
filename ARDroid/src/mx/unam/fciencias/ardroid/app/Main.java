@@ -43,6 +43,7 @@ public class Main extends Activity {
 		initWindowParameters();
 		initComponents();
 		initLayers();
+		TestPOIDrawing.testDrawPOI();
 	}
 
 	/**

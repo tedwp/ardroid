@@ -1,6 +1,8 @@
 package mx.unam.fciencias.ardroid.app;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
 import android.view.View;
 
@@ -14,7 +16,7 @@ import android.view.View;
 public class POI extends View {
 
 	/** Ubicación del POI. */
-	private Location location;
+	private Location poiLocation;
 
 	/** Ubicación del dispositivo. */
 	public static Location deviceLocation;
@@ -34,6 +36,8 @@ public class POI extends View {
 	/** The source. */
 	private String source;
 
+	private Paint paint1;
+
 	/**
 	 * Instantiates a new pOI.
 	 *
@@ -42,33 +46,26 @@ public class POI extends View {
 	 */
 	public POI(Location location, Location deviceLocation) {
 		super(Main.context);
-		this.location = location;
-		this.setDeviceLocation(deviceLocation);
-		azimuth = deviceLocation.bearingTo(location);
-		distance = deviceLocation.distanceTo(location);
-
-		// Calculamos la inclinación a la que está el POI con respecto a nuestra
-		// ubicación
-		if (deviceLocation.hasAltitude() && location.hasAltitude()) {
-			double altitudeDiff;
-			boolean negative = false;
-			if (location.getAltitude() > deviceLocation.getAltitude()) {
-				altitudeDiff = location.getAltitude()
-						- deviceLocation.getAltitude();
-			} else {
-				altitudeDiff = deviceLocation.getAltitude()
-						- location.getAltitude();
-				negative = true;
-			}
-			if (negative) {
-				inclination = (float) (Math
-						.atan(((double) altitudeDiff / distance)) * -1);
-			} else {
-				inclination = (float) Math.atan((double) altitudeDiff
-						/ distance);
-			}
+		this.poiLocation = location;
+		if (POI.deviceLocation == null && poiLocation != null) {
+			this.setDeviceLocation(deviceLocation);
 		}
+		updateValues();
+		initPaint();
+	}
 
+	private void initPaint() {
+		paint1 = new Paint();
+		paint1.setColor(Color.RED);
+        paint1.setAntiAlias(true);
+	}
+
+	public void updateValues() {
+		if(poiLocation != null && POI.deviceLocation != null) {
+			azimuth = deviceLocation.bearingTo(poiLocation);
+			distance = deviceLocation.distanceTo(poiLocation);
+			setInclination();
+		}
 	}
 
 	/**
@@ -77,9 +74,11 @@ public class POI extends View {
 	 * @param canvas the canvas
 	 */
 	@Override
-	protected void onDraw(Canvas canvas) {
-		// TODO Auto-generated method stub
-		super.onDraw(canvas);
+	public void draw(Canvas canvas) {
+		int x = getLeft();
+		int y = getTop();
+		canvas.drawCircle(x, y, 20, paint1);
+		super.draw(canvas);
 	}
 
 	/**
@@ -88,7 +87,7 @@ public class POI extends View {
 	 * @return the location
 	 */
 	public Location getLocation() {
-		return location;
+		return poiLocation;
 	}
 
 	/**
@@ -97,7 +96,7 @@ public class POI extends View {
 	 * @param location the location to set
 	 */
 	public void setLocation(Location location) {
-		this.location = location;
+		this.poiLocation = location;
 	}
 
 	/**
@@ -152,6 +151,34 @@ public class POI extends View {
 	 */
 	public void setInclination(float inclination) {
 		this.inclination = inclination;
+	}
+
+	/**
+	 * Calculamos la inclinación de este POI con respecto a la ubicación y
+	 * altitude del dispositivo
+	 */
+	private void setInclination() {
+		// Calculamos la inclinación a la que está el POI con respecto a nuestra
+		// ubicación
+		if (POI.deviceLocation.hasAltitude() && poiLocation.hasAltitude()) {
+			double altitudeDiff;
+			boolean negative = false;
+			if (poiLocation.getAltitude() > POI.deviceLocation.getAltitude()) {
+				altitudeDiff = poiLocation.getAltitude()
+						- POI.deviceLocation.getAltitude();
+			} else {
+				altitudeDiff = POI.deviceLocation.getAltitude()
+						- poiLocation.getAltitude();
+				negative = true;
+			}
+			if (negative) {
+				inclination = (float) (Math
+						.atan(((double) altitudeDiff / distance)) * -1);
+			} else {
+				inclination = (float) Math.atan((double) altitudeDiff
+						/ distance);
+			}
+		}
 	}
 
 	/**

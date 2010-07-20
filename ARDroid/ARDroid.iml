@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module classpath="eclipse" classpath-dir="$MODULE_DIR$" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="android" name="Android">
+      <configuration>
+        <option name="PLATFORM_NAME" value="Android 2.0 Platform" />
+        <option name="USE_CUSTOM_GEN_FOLDER" value="false" />
+        <option name="CUSTOM_GEN_FOLDER_RELATIVE_PATH" value="" />
+      </configuration>
+    </facet>
+  </component>
+</module>
+
