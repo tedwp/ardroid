@@ -81,11 +81,11 @@ public class ARLayer extends View {
 		super(Main.context);
 		initLayout();
 		initSensors();
-		initGPS();
 		initDrawComponents();
 		poiList = java.util.Collections.synchronizedList(new ArrayList<POI>());
 		// TODO: Checar si necesita ser synchronized o no hace falta.
 		initAvgArrays();
+		initGPS();
 	}
 
 	private void initAvgArrays() {
@@ -126,8 +126,10 @@ public class ARLayer extends View {
 		criteria.setBearingRequired(true);
 		criteria.setCostAllowed(true);
 		String provider = locationManager.getBestProvider(criteria, true);
+		Log.d("gps", "provider: "+provider);
 		locationManager.requestLocationUpdates(provider, 30000, 5,
 				locationListener);
+		updatePOILocation(locationManager.getLastKnownLocation(provider));
 	}
 
 	/**
@@ -265,7 +267,7 @@ public class ARLayer extends View {
 			// definir el threshold
 			if (directionChanged || inclinationChanged) {
 				if (locationChanged) {
-					Log.d("location", "Location changed, updating");
+					Log.d("gps", "Location changed, updating");
 					updatePOILayout(avgLocalDirection, avgInclination,
 							currentLocation);
 					locationChanged = false;
@@ -337,6 +339,12 @@ public class ARLayer extends View {
 		return ra;
 	}
 
+	/**
+	 * Calcula la posición en x de un POI
+	 *
+	 * @param dir Dirección del POI
+	 * @return Posición en x del POI
+	 */
 	private float xPosition(float dir) {
 		float x;
 		float la = leftArm();
@@ -372,6 +380,15 @@ public class ARLayer extends View {
 		return (y * screenHeight) / CAMERA_ANGLE_VERTICAL;
 	}
 
+	private void updatePOILocation(Location location) {
+		POI.deviceLocation = location;
+		Iterator<POI> poiIterator = poiList.iterator();
+		while (poiIterator.hasNext()) {
+			POI poi = poiIterator.next();
+			poi.updateValues();
+		}
+	}
+
 	/**
 	 * Método para calcular la posición en pantalla de cada uno de los POI.
 	 *
@@ -381,15 +398,10 @@ public class ARLayer extends View {
 	 */
 	private void updatePOILayout(float direction, float inclination,
 			Location location) {
-		Iterator<POI> poiIterator = poiList.iterator();
 		if (location != null) {
-			POI.deviceLocation = location;
-			while (poiIterator.hasNext()) {
-				POI poi = poiIterator.next();
-				poi.updateValues();
-			}
+			updatePOILocation(location);
 		}
-
+		Iterator<POI> poiIterator = poiList.iterator();
 		poiIterator = poiList.iterator();
 		while (poiIterator.hasNext()) {
 			POI poi = poiIterator.next();
