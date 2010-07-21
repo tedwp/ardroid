@@ -1,5 +1,9 @@
 package mx.unam.fciencias.ardroid.app;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.hardware.Sensor;
@@ -15,10 +19,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 // TODO: Auto-generated Javadoc
 
@@ -55,8 +55,6 @@ public class ARLayer extends View {
 	private LocationManager locationManager;
 	private SensorManager sensorManager;
 
-	private SensorAvgFilter sensorAvgFilter;
-
 	/**
 	 * Lista de POI
 	 */
@@ -77,7 +75,7 @@ public class ARLayer extends View {
 		initDrawComponents();
 		poiList = java.util.Collections.synchronizedList(new ArrayList<POI>());
 		// TODO: Checar si necesita ser synchronized o no hace falta.
-		sensorAvgFilter = new SensorAvgFilter();
+		SensorAvgFilter.initAvgArrays();
 	}
 
 	public void onStart() {
@@ -165,19 +163,26 @@ public class ARLayer extends View {
 
 		public void onSensorChanged(SensorEvent event) {
 			if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-				direction = SensorAvgFilter.orientationListener(event.values[0]);
+				direction = SensorAvgFilter
+						.orientationListener(event.values[0])+90;
+				if(direction > 360) {
+					direction -= 360;
+				}
+				Log.d("gps", "direction: "+direction);
+				Log.d("gps", "directionr: "+event.values[0]);
 			}
 
 			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-				inclination = SensorAvgFilter.accelerometerListener(event.values[0], event.values[2]);
+				inclination = SensorAvgFilter.accelerometerListener(
+						event.values[0], event.values[2]);
 
 			}
 
-			if (SensorAvgFilter.directionChanged || SensorAvgFilter.inclinationChanged) {
+			if (SensorAvgFilter.directionChanged
+					|| SensorAvgFilter.inclinationChanged) {
 				if (locationChanged) {
 					Log.d("gps", "Location changed, updating");
-					updatePOILayout(direction, inclination,
-							currentLocation);
+					updatePOILayout(direction, inclination, currentLocation);
 					locationChanged = false;
 				} else {
 					updatePOILayout(direction, inclination, null);
@@ -199,6 +204,8 @@ public class ARLayer extends View {
 
 		public void onLocationChanged(Location location) {
 			currentLocation = location;
+			Log.d("gps2", "cambio la ubicacion: " + location.getLatitude()
+					+ ", " + location.getLongitude() +", altitude: "+location.getAltitude());
 			locationChanged = true;
 		}
 
@@ -272,11 +279,18 @@ public class ARLayer extends View {
 	}
 
 	private void updatePOILocation(Location location) {
-		POI.deviceLocation = location;
-		Iterator<POI> poiIterator = poiList.iterator();
-		while (poiIterator.hasNext()) {
-			POI poi = poiIterator.next();
-			poi.updateValues();
+		if (location != null) {
+			Log.d("gps",
+					"Loc: " + location.getLatitude() + ", "
+							+ location.getLongitude());
+			POI.deviceLocation = location;
+			Iterator<POI> poiIterator = poiList.iterator();
+			while (poiIterator.hasNext()) {
+				POI poi = poiIterator.next();
+				poi.updateValues();
+			}
+		} else {
+			Log.d("gps", "Actualizando con location null");
 		}
 	}
 
@@ -318,7 +332,7 @@ public class ARLayer extends View {
 		Iterator<POI> poiIterator = poiList.iterator();
 		while (poiIterator.hasNext()) {
 			POI poi = poiIterator.next();
-			Log.d("dibujando", "intentando dibujar el poi en: " + poi.getLeft()
+			Log.d("dibujando", "intentando dibujar el poi "+poi.getName()+" en: " + poi.getLeft()
 					+ " ," + poi.getTop());
 			poi.draw(canvas);
 		}

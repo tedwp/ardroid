@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Location;
+import android.util.Log;
 import android.view.View;
 
 // TODO: Auto-generated Javadoc
@@ -45,10 +46,11 @@ public class POI extends View {
 	 * @param location the location
 	 * @param deviceLocation the device location
 	 */
-	public POI(Location location, Location deviceLocation) {
+	public POI(Location poiLocation, Location deviceLocation, String name) {
 		super(Main.context);
-		this.poiLocation = location;
-		if (POI.deviceLocation == null && poiLocation != null) {
+		this.name = name;
+		this.poiLocation = poiLocation;
+		if (POI.deviceLocation != null && poiLocation != null) {
 			this.setDeviceLocation(deviceLocation);
 		}
 		updateValues();
@@ -58,18 +60,26 @@ public class POI extends View {
 	private void initPaint() {
 		paint1 = new Paint();
 		paint1.setColor(Color.RED);
-        paint1.setAntiAlias(true);
-        paint2 = new Paint();
-        paint2.setColor(Color.WHITE);
-        paint2.setAntiAlias(true);
-        paint2.setFakeBoldText(true);
-        paint2.setTextSize(24);
+		paint1.setAntiAlias(true);
+		paint2 = new Paint();
+		paint2.setColor(Color.WHITE);
+		paint2.setAntiAlias(true);
+		paint2.setFakeBoldText(true);
+		paint2.setTextSize(24);
 	}
 
 	public void updateValues() {
-		if(poiLocation != null && POI.deviceLocation != null) {
-			azimuth = deviceLocation.bearingTo(poiLocation);
-			distance = deviceLocation.distanceTo(poiLocation);
+		if (poiLocation != null && POI.deviceLocation != null) {
+			azimuth = POI.deviceLocation.bearingTo(poiLocation);
+			Log.d("gps", "poi: "+poiLocation.getLatitude()+" ,"+poiLocation.getLongitude());
+			Log.d("gps", "device: "+POI.deviceLocation.getLatitude()+" ,"+POI.deviceLocation.getLongitude());
+			Log.d("gps", "azumuth: "+name+" :" + azimuth);
+			if (azimuth < 0) {
+				azimuth += 360;
+			}
+			Log.d("gps", "azumuth: "+name+" :" + azimuth);
+			distance = POI.deviceLocation.distanceTo(poiLocation);
+			Log.d("gps", "distance: "+name+" :" + distance);
 			setInclination();
 		}
 	}
@@ -84,7 +94,7 @@ public class POI extends View {
 		int x = getLeft();
 		int y = getTop();
 		canvas.drawCircle(x, y, 20, paint1);
-		canvas.drawText("Casa de Seliks", x-35, y+35, paint2);
+		canvas.drawText(name, x - 35, y + 35, paint2);
 		super.draw(canvas);
 	}
 
@@ -178,15 +188,16 @@ public class POI extends View {
 						- poiLocation.getAltitude();
 				negative = true;
 			}
+			double coef = altitudeDiff/(double)distance;
+			Log.d("gps2", "Coef: "+coef);
 			if (negative) {
-				inclination = (float) (Math
-						.atan(((double) altitudeDiff / distance)) * -1);
+				inclination = (float) Math.toDegrees(Math.atan(coef)) * -1;
 			} else {
-				inclination = (float) Math.atan((double) altitudeDiff
-						/ distance);
+				inclination = (float) Math.toDegrees(Math.atan(coef));
 			}
-		}else {
-			//TODO: Checar si con esto la hago
+			Log.d("gps2", "inc "+name+": "+inclination);
+		} else {
+			// TODO: Checar si con esto la hago
 			inclination = 0;
 		}
 	}
