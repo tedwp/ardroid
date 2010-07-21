@@ -77,7 +77,9 @@ public class Main extends Activity {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see android.app.Activity#onResume()
 	 */
 	@Override
@@ -86,7 +88,9 @@ public class Main extends Activity {
 		arLayer.onStart();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 *
 	 * @see android.app.Activity#onStop()
 	 */
 	@Override

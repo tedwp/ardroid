@@ -31,11 +31,7 @@ public class SensorAvgFilter {
 	public static boolean directionChanged = false;
 	public static boolean inclinationChanged = false;
 
-	public SensorAvgFilter() {
-		initAvgArrays();
-	}
-
-	private void initAvgArrays() {
+	public static void initAvgArrays() {
 		directions = new ArrayList<Float>();
 		avgRollingZ = new ArrayList<Float>();
 		avgRollingX = new ArrayList<Float>();
