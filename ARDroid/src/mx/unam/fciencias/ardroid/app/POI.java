@@ -37,6 +37,7 @@ public class POI extends View {
 	private String source;
 
 	private Paint paint1;
+	private Paint paint2;
 
 	/**
 	 * Instantiates a new pOI.
@@ -58,6 +59,11 @@ public class POI extends View {
 		paint1 = new Paint();
 		paint1.setColor(Color.RED);
         paint1.setAntiAlias(true);
+        paint2 = new Paint();
+        paint2.setColor(Color.WHITE);
+        paint2.setAntiAlias(true);
+        paint2.setFakeBoldText(true);
+        paint2.setTextSize(24);
 	}
 
 	public void updateValues() {
@@ -78,6 +84,7 @@ public class POI extends View {
 		int x = getLeft();
 		int y = getTop();
 		canvas.drawCircle(x, y, 20, paint1);
+		canvas.drawText("Casa de Seliks", x-35, y+35, paint2);
 		super.draw(canvas);
 	}
 
@@ -178,6 +185,9 @@ public class POI extends View {
 				inclination = (float) Math.atan((double) altitudeDiff
 						/ distance);
 			}
+		}else {
+			//TODO: Checar si con esto la hago
+			inclination = 0;
 		}
 	}
 
