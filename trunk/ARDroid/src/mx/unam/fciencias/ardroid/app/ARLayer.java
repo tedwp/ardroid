@@ -52,21 +52,15 @@ public class ARLayer extends View {
 	private int screenWidth;
 	private int screenHeight;
 
+	private LocationManager locationManager;
+	private SensorManager sensorManager;
+
+	private SensorAvgFilter sensorAvgFilter;
+
 	/**
 	 * Lista de POI
 	 */
 	public static List<POI> poiList;
-
-	private ArrayList<Float> directions;
-
-	private ArrayList<Float> avgRollingZ;
-	private ArrayList<Float> avgRollingX;
-
-	// Usamos un filtro de promedios con las últimas <code>AVG_NUM</code>
-	// lecturas de los sensores para determinar la nueva dirección e
-	// inclinación del teléfono. Hacemos esto para filtrar el ruido de los
-	// sensores.
-	private static final int AVG_NUM = 8;
 
 	private static final float CAMERA_ANGLE_HORIZONTAL = 49.55f;
 	private static final float CAMERA_ANGLE_VERTICAL = 34.2f;
@@ -80,23 +74,20 @@ public class ARLayer extends View {
 	public ARLayer() {
 		super(Main.context);
 		initLayout();
-		initSensors();
 		initDrawComponents();
 		poiList = java.util.Collections.synchronizedList(new ArrayList<POI>());
 		// TODO: Checar si necesita ser synchronized o no hace falta.
-		initAvgArrays();
+		sensorAvgFilter = new SensorAvgFilter();
+	}
+
+	public void onStart() {
+		initSensors();
 		initGPS();
 	}
 
-	private void initAvgArrays() {
-		directions = new ArrayList<Float>();
-		avgRollingZ = new ArrayList<Float>();
-		avgRollingX = new ArrayList<Float>();
-		for (int i = 0; i < (AVG_NUM - 1); i++) {
-			directions.add(0f);
-			avgRollingZ.add(0f);
-			avgRollingX.add(0f);
-		}
+	public void onStop() {
+		stopGPS();
+		stopSensors();
 	}
 
 	private void initLayout() {
@@ -117,7 +108,6 @@ public class ARLayer extends View {
 	 * para seguir las convenciones de Android.
 	 */
 	private void initGPS() {
-		LocationManager locationManager;
 		String context = Context.LOCATION_SERVICE;
 		locationManager = (LocationManager) Main.context
 				.getSystemService(context);
@@ -126,7 +116,7 @@ public class ARLayer extends View {
 		criteria.setBearingRequired(true);
 		criteria.setCostAllowed(true);
 		String provider = locationManager.getBestProvider(criteria, true);
-		Log.d("gps", "provider: "+provider);
+		Log.d("gps", "provider: " + provider);
 		locationManager.requestLocationUpdates(provider, 30000, 5,
 				locationListener);
 		updatePOILocation(locationManager.getLastKnownLocation(provider));
@@ -143,13 +133,13 @@ public class ARLayer extends View {
 	 * actualizaciones de cada sensor por segundo.
 	 */
 	private void initSensors() {
-		SensorManager sm = (SensorManager) Main.context
+		sensorManager = (SensorManager) Main.context
 				.getSystemService(Context.SENSOR_SERVICE);
-		sm.registerListener(orientationListener,
-				sm.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+		sensorManager.registerListener(orientationListener,
+				sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
 				SensorManager.SENSOR_DELAY_GAME);
-		sm.registerListener(orientationListener,
-				sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+		sensorManager.registerListener(orientationListener,
+				sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
 				SensorManager.SENSOR_DELAY_GAME);
 	}
 
@@ -160,122 +150,38 @@ public class ARLayer extends View {
 
 	}
 
+	private void stopGPS() {
+		locationManager.removeUpdates(locationListener);
+	}
+
+	private void stopSensors() {
+		sensorManager.unregisterListener(orientationListener);
+	}
+
 	/**
 	 * The orientation listener.
 	 */
 	final SensorEventListener orientationListener = new SensorEventListener() {
 
-		private float tmpDirection;
-		private float avgLocalDirection;
-		private float prevAvgLocalDirection = 0;
-		private float avgSum;
-
-		private float avgRollZSum;
-		private float avgRollXSum;
-		private float avgInclination;
-		private float prevAvgInclination = 0;
-
-		private boolean directionChanged = false;
-		private boolean inclinationChanged = false;
-
-		private static final float DIRECTION_THRESHOLD = 0.0f;
-		private static final float INCLINATION_THRESHOLD = 0;
-
 		public void onSensorChanged(SensorEvent event) {
 			if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-
-				tmpDirection = event.values[0];
-				if (tmpDirection < 0) {
-					tmpDirection += 360;
-				}
-				if (tmpDirection < 0) {
-					avgLocalDirection = 360 + tmpDirection;
-				} else {
-					avgLocalDirection = tmpDirection;
-				}
-				avgSum = 0;
-				for (int i = 0; i < (AVG_NUM - 1); i++) {
-					avgSum += directions.get(i);
-				}
-				avgSum += avgLocalDirection;
-
-				directions.add(avgLocalDirection);
-				avgLocalDirection = avgSum / AVG_NUM;
-				directions.remove(0);
-				if (changeAboveThreshold(prevAvgLocalDirection,
-						avgLocalDirection, DIRECTION_THRESHOLD)) {
-					directionChanged = true;
-					prevAvgLocalDirection = avgLocalDirection;
-					direction = avgLocalDirection;
-				}
+				direction = SensorAvgFilter.orientationListener(event.values[0]);
 			}
 
 			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-				avgRollZSum = 0;
-				avgRollXSum = 0;
-				for (int i = 0; i < (AVG_NUM - 1); i++) {
-					avgRollZSum += avgRollingZ.get(i);
-
-				}
-
-				for (int i = 0; i < (AVG_NUM - 1); i++) {
-					avgRollXSum += avgRollingX.get(i);
-
-				}
-
-				avgRollZSum += event.values[2];
-				avgRollXSum += event.values[0];
-
-				avgRollZSum = avgRollZSum / AVG_NUM;
-				avgRollXSum = avgRollXSum / AVG_NUM;
-
-				avgRollingZ.add(event.values[2]);
-				avgRollingZ.remove(0);
-
-				avgRollingX.add(event.values[0]);
-				avgRollingX.remove(0);
-
-				if (avgRollZSum != 0.0) {
-					avgInclination = (float) Math.atan(avgRollXSum
-							/ avgRollZSum);
-				} else if (avgRollXSum < 0) {
-					avgInclination = (float) (Math.PI / 2.0);
-				} else if (avgRollXSum >= 0) {
-					avgInclination = (float) (3 * Math.PI / 2.0);
-				}
-
-				// convert to degress
-				avgInclination = (float) (avgInclination * (360 / (2 * Math.PI)));
-
-				// flip!
-				if (avgInclination < 0) {
-					avgInclination = avgInclination + 90;
-				} else {
-					avgInclination = avgInclination - 90;
-				}
-				// avgInclination es la inclinación final
-
-				if (changeAboveThreshold(prevAvgInclination, avgInclination,
-						INCLINATION_THRESHOLD)) {
-					inclinationChanged = true;
-					prevAvgInclination = avgInclination;
-					inclination = avgInclination;
-				}
+				inclination = SensorAvgFilter.accelerometerListener(event.values[0], event.values[2]);
 
 			}
 
-			// definir el threshold
-			if (directionChanged || inclinationChanged) {
+			if (SensorAvgFilter.directionChanged || SensorAvgFilter.inclinationChanged) {
 				if (locationChanged) {
 					Log.d("gps", "Location changed, updating");
-					updatePOILayout(avgLocalDirection, avgInclination,
+					updatePOILayout(direction, inclination,
 							currentLocation);
 					locationChanged = false;
 				} else {
-					updatePOILayout(avgLocalDirection, avgInclination, null);
+					updatePOILayout(direction, inclination, null);
 				}
-				directionChanged = false;
-				inclinationChanged = false;
 				postInvalidate();
 			}
 
@@ -285,21 +191,6 @@ public class ARLayer extends View {
 			// No necesitamos hacer nada aquí
 		}
 	};
-
-	/**
-	 * Calculamos si la diferencia entre ambos valores está arriba de cierto
-	 * umbral. Usamos este método ya que a veces el cambio de dirección o
-	 * inclinación es mínimo y no necesitamos recalcular la posición de los POI.
-	 *
-	 * @param val1 Primer valor
-	 * @param val2 Segundo valor
-	 * @param threshold Umbral
-	 * @return Verdadero si la diferencia entre <code>val1</code> y
-	 *         <code>val2</code> es mayor que <code>threshold</code>
-	 */
-	private boolean changeAboveThreshold(float val1, float val2, float threshold) {
-		return Math.abs(val1 - val2) > threshold;
-	}
 
 	/**
 	 * Escucha para el cambio de ubicación.

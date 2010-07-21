@@ -76,4 +76,22 @@ public class Main extends Activity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 	}
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	protected void onStart() {
+		super.onStart();
+		arLayer.onStart();
+	}
+
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onStop()
+	 */
+	@Override
+	protected void onStop() {
+		arLayer.onStop();
+		super.onStop();
+	}
 }
