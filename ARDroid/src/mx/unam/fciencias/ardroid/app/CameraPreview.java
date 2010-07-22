@@ -82,18 +82,16 @@ public class CameraPreview extends SurfaceView implements
 		Size optimalSize = null;
 		double minDiff = Double.MAX_VALUE;
 
-		int targetHeight = h;
-
-		// Try to find an size match aspect ratio and size
+        // Try to find an size match aspect ratio and size
 		for (Camera.Size size : sizes) {
 
 			Log.d("Sizes", "W: " + size.width + ", H: " + size.height);
 			double ratio = (double) size.width / size.height;
 			if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
 				continue;
-			if (Math.abs(size.height - targetHeight) < minDiff) {
+			if (Math.abs(size.height - h) < minDiff) {
 				optimalSize = size;
-				minDiff = Math.abs(size.height - targetHeight);
+				minDiff = Math.abs(size.height - h);
 			}
 		}
 
@@ -101,9 +99,9 @@ public class CameraPreview extends SurfaceView implements
 		if (optimalSize == null) {
 			minDiff = Double.MAX_VALUE;
 			for (Camera.Size size : sizes) {
-				if (Math.abs(size.height - targetHeight) < minDiff) {
+				if (Math.abs(size.height - h) < minDiff) {
 					optimalSize = size;
-					minDiff = Math.abs(size.height - targetHeight);
+					minDiff = Math.abs(size.height - h);
 				}
 			}
 		}
