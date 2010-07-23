@@ -66,6 +66,8 @@ public class ARLayer extends View {
     private static final float CAMERA_ANGLE_HORIZONTAL_HALF = CAMERA_ANGLE_HORIZONTAL / 2;
     private static final float CAMERA_ANGLE_VERTICAL_HALF = CAMERA_ANGLE_VERTICAL / 2;
 
+    public static View arView;
+
     /**
      * Constructor
      */
@@ -76,6 +78,7 @@ public class ARLayer extends View {
         poiList = java.util.Collections.synchronizedList(new ArrayList<POI>());
         // TODO: Checar si necesita ser synchronized o no hace falta.
         SensorAvgFilter.initAvgArrays();
+        arView = this;
     }
 
     public void onStart() throws LocationProviderNullException {
@@ -340,12 +343,18 @@ public class ARLayer extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        
+        
+
+        
+//        Log.d("popup", "popup creado dropdown");
+//        return true;
+
         boolean ret = false;
         Log.d("touch", "se toco la pantalla");
         for (POI poi : poiList) {
             ret = poi.dispatchTouchEvent(event);
         }
-//        Toast.makeText(Main.context, "Me tocaste", Toast.LENGTH_LONG).show();
         return ret;
     }
 }
