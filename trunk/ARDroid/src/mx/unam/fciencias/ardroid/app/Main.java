@@ -141,6 +141,7 @@ public class Main extends Activity {
 
     @Override
     protected void onStop() {
+        cameraPreview.onStop();
         arLayer.onStop();
         super.onStop();
     }

@@ -6,8 +6,11 @@ import android.graphics.Paint;
 import android.graphics.Region;
 import android.location.Location;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 // TODO: Auto-generated Javadoc
@@ -119,8 +122,8 @@ public class POI extends View {
      */
     @Override
     public void draw(Canvas canvas) {
-        int x = getLeft()+poiHalfWidth;
-        int y = getTop()+poiHalfHeight;
+        int x = getLeft() + poiHalfWidth;
+        int y = getTop() + poiHalfHeight;
         canvas.drawCircle(x, y, 35, paint1);
         canvas.drawText(name, x - 35, y + 55, paint2);
         super.draw(canvas);
@@ -205,12 +208,25 @@ public class POI extends View {
                 .contains((int) event.getX(), (int) event.getY())) {
             Toast.makeText(Main.context, "me tocaste: " + name, Toast.LENGTH_SHORT).show();
             Log.d("touch", "tocado: " + name);
+
+
+            View v = LayoutInflater.from(Main.context).inflate(R.layout.popup, null);
+            Log.d("popup", "view null? " + (v == null));
+            PopupWindow poiPopup = new PopupWindow(Main.context);
+            poiPopup.setWidth(420);
+            poiPopup.setHeight(300);
+            poiPopup.setFocusable(true);
+            poiPopup.update();
+            poiPopup.setContentView(v);
+            poiPopup.showAtLocation(ARLayer.arView, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM, 0, 0);
+
+
             return true;
         }
         return false;
     }
 
-    public void poiLayout(int left, int top, int right, int bottom){
-        this.layout(left-poiHalfWidth, top-poiHalfHeight, right+poiHalfWidth, +bottom+poiHalfHeight);
+    public void poiLayout(int left, int top, int right, int bottom) {
+        this.layout(left - poiHalfWidth, top - poiHalfHeight, right + poiHalfWidth, +bottom + poiHalfHeight);
     }
 }
