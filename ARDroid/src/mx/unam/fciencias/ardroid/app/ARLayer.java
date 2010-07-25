@@ -12,10 +12,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
+import android.view.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +65,8 @@ public class ARLayer extends View {
 
     public static View arView;
 
+    public static POIPopup poiPopup;
+
     /**
      * Constructor
      */
@@ -96,6 +95,7 @@ public class ARLayer extends View {
                 .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         screenHeight = display.getHeight();
         screenWidth = display.getWidth();
+        poiPopup = new POIPopup(screenWidth, screenHeight);
     }
 
     /**
@@ -334,8 +334,6 @@ public class ARLayer extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         for (POI poi : poiList) {
-//            Log.d("dibujando", "intentando dibujar el poi " + poi.getName() + " en: " + poi.getLeft()
-//                    + " ," + poi.getTop());
             poi.draw(canvas);
         }
         super.onDraw(canvas);
@@ -343,15 +341,7 @@ public class ARLayer extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        
-        
-
-        
-//        Log.d("popup", "popup creado dropdown");
-//        return true;
-
         boolean ret = false;
-        Log.d("touch", "se toco la pantalla");
         for (POI poi : poiList) {
             ret = poi.dispatchTouchEvent(event);
         }

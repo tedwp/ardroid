@@ -6,12 +6,8 @@ import android.graphics.Paint;
 import android.graphics.Region;
 import android.location.Location;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.PopupWindow;
-import android.widget.Toast;
 
 // TODO: Auto-generated Javadoc
 
@@ -57,6 +53,8 @@ public class POI extends View {
      */
     private String source;
 
+    private String infoUrl;
+
     private Paint paint1;
     private Paint paint2;
     private int poiHalfWidth;
@@ -68,12 +66,14 @@ public class POI extends View {
      * @param poiLocation    La ubiciación del POI
      * @param deviceLocation La ubicación del dispositivo
      * @param name           Nombre de este POI
+     * @param infoUrl
      */
-    public POI(Location poiLocation, Location deviceLocation, String name) {
+    public POI(Location poiLocation, Location deviceLocation, String name, String infoUrl) {
         super(Main.context);
         this.name = name;
         this.poiLocation = poiLocation;
         this.source = poiLocation.getProvider();
+        this.infoUrl = infoUrl;
         if (POI.deviceLocation != null) {
             this.setDeviceLocation(deviceLocation);
         }
@@ -199,28 +199,9 @@ public class POI extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.d("touch", "me pasaron el touchEvent: " + name);
-        Log.d("touch", "region: " + getLeft() + ", " + getTop() + ", " + getRight() + ", " + getBottom());
-        Log.d("touch", "event: " + (int) event.getX() + ", " + (int) event.getY());
-        Log.d("touch", "Contiene: " + (new Region(getLeft(), getTop(), getRight(), getBottom()))
-                .contains((int) event.getX(), (int) event.getY()));
         if ((new Region(getLeft(), getTop(), getRight(), getBottom()))
                 .contains((int) event.getX(), (int) event.getY())) {
-            Toast.makeText(Main.context, "me tocaste: " + name, Toast.LENGTH_SHORT).show();
-            Log.d("touch", "tocado: " + name);
-
-
-            View v = LayoutInflater.from(Main.context).inflate(R.layout.popup, null);
-            Log.d("popup", "view null? " + (v == null));
-            PopupWindow poiPopup = new PopupWindow(Main.context);
-            poiPopup.setWidth(420);
-            poiPopup.setHeight(300);
-            poiPopup.setFocusable(true);
-            poiPopup.update();
-            poiPopup.setContentView(v);
-            poiPopup.showAtLocation(ARLayer.arView, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM, 0, 0);
-
-
+            ARLayer.poiPopup.show(this);
             return true;
         }
         return false;
@@ -228,5 +209,13 @@ public class POI extends View {
 
     public void poiLayout(int left, int top, int right, int bottom) {
         this.layout(left - poiHalfWidth, top - poiHalfHeight, right + poiHalfWidth, +bottom + poiHalfHeight);
+    }
+
+    public float getDistance() {
+        return distance;
+    }
+
+    public String getInfoUrl() {
+        return infoUrl;
     }
 }
