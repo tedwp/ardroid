@@ -15,27 +15,53 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:text="distancia"
                 android:layout_alignParentLeft="true"
+                android:layout_marginLeft="8sp"
+                android:layout_marginTop="10sp"
                 />
         <TextView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
-                android:text="titulo"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="8sp"
                 />
         <ImageButton
                 android:id="@+id/closebutton"
                 android:layout_alignParentRight="true"
-                
+                android:src="@drawable/btn_close_normal"
                 android:layout_width="32sp"
                 android:layout_height="36sp"
-                android:layout_marginRight="8sp"
+                android:layout_marginRight="2sp"
                 android:layout_marginTop="2sp"
                 />
     </RelativeLayout>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/progressbar_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+            >
+        <ProgressBar
+                android:id="@+id/progressbar_popup"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="200sp"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="0"
+                android:layout_centerHorizontal="true"
+                />
+        <TextView
+                android:id="@+id/text_progressbar_popup"
+                android:text="@string/loading_popup_webview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textColor="#FFFFFFFF"
+                />
+    </RelativeLayout>
+
     <WebView
             android:id="@+id/webView"
             android:layout_width="fill_parent"
