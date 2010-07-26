@@ -3,13 +3,13 @@ package mx.unam.fciencias.ardroid.app;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
+import android.graphics.RectF;
 import android.view.View;
 
 /**
- * Creado por: Sebastián García Anderman
- * UNAM | Facultad de Ciencias | Ciencias de la Computación
- * Fecha: 25-jul-2010
+ * Clase que muestra un radar en pantalla con los POI en la dirección en que se encuentran
+ *
+ * @author Sebastián García Anderman
  */
 public class Radar extends View {
 
@@ -19,31 +19,63 @@ public class Radar extends View {
     Paint poiNotInSightPaint;
     Paint radarLinesPaint;
 
-    private int radius;
+    private static int radius;
     private int xPosition;
     private int yPosition;
 
     public static float direction;
 
     private float range;
-    private float scale;
+    private static float scale;
 
-    private String directionText;
+    private static String directionText = "";
 
-    public Radar() {
+    private int directionTextXPos;
+    private int directionTextYPos;
+
+    private float radarLineLeftXEndPos;
+    private float radarLineLeftYEndPos;
+    private float radarLineRightXEndPos;
+    private float radarLineRightYEndPos;
+    private Paint semiCirclePaint;
+    private RectF semiCircleRect;
+
+    /**
+     * Construimos el Radar
+     *
+     * @param screenHeight Altura de la pantalla en orientación landscape
+     */
+    public Radar(int screenHeight) {
         super(Main.context);
+        calcDimensions(screenHeight);
         initPaints();
-        radius = 50;
-        xPosition = 240;
-        yPosition = 160;
-        directionText = "0º N";
-
-        direction = 0;
-
-        range = 100;
-        scale = (float) radius / range;
     }
 
+    /**
+     * Calculamos las dimensiones del radar, es 12.5% de la altura de la pantalla.
+     * Calculamos las posiciones de los distintos elementos del radar.
+     *
+     * @param screenHeight
+     */
+    private void calcDimensions(int screenHeight) {
+        radius = screenHeight / 8;
+        xPosition = radius + 10;
+        yPosition = radius + 10;
+        direction = 0;
+        range = 100;
+        scale = (float) radius / range;
+
+        directionTextXPos = xPosition;
+        directionTextYPos = yPosition - radius + 10;
+        radarLineLeftXEndPos = (float) ((Math.cos(Math.toRadians(225)) * radius) + xPosition);
+        radarLineLeftYEndPos = (float) (Math.sin(Math.toRadians(225)) * radius) + yPosition;
+        radarLineRightXEndPos = (float) (Math.cos(Math.toRadians(315)) * radius) + xPosition;
+        radarLineRightYEndPos = (float) (Math.sin(Math.toRadians(315)) * radius) + yPosition;
+    }
+
+    /**
+     * Iniciamos los elementos usados para pintar en <code>onDraw</code>
+     */
     private void initPaints() {
         radarPaint = new Paint();
         radarPaint.setColor(Color.argb(180, 0, 0, 200));
@@ -51,32 +83,56 @@ public class Radar extends View {
 
         radarLinesPaint = new Paint();
         radarLinesPaint.setColor(Color.WHITE);
+        radarLinesPaint.setAntiAlias(true);
 
         directionTextPaint = new Paint();
         directionTextPaint.setColor(Color.WHITE);
         directionTextPaint.setAntiAlias(true);
         directionTextPaint.setFakeBoldText(true);
         directionTextPaint.setTextSize(20);
+        directionTextPaint.setTextAlign(Paint.Align.CENTER);
 
         poiInSightPaint = new Paint();
         poiInSightPaint.setColor(Color.GREEN);
 
         poiNotInSightPaint = new Paint();
         poiNotInSightPaint.setColor(Color.RED);
+
+        semiCirclePaint = new Paint();
+        semiCirclePaint.setColor(Color.argb(200, 0, 0, 140));
+
+        semiCircleRect = new RectF(xPosition - radius, yPosition - radius, xPosition + radius, yPosition + radius);
+    }
+
+    /**
+     * Ponemos la dirección en la que está viendo el teléfono
+     * @param dir Dirección a la que apunta el teléfono
+     */
+    public static void setDirection(float dir) {
+        direction = dir;
+        directionText = (int) dir + "º";
+    }
+
+    /**
+     * Cambiamos el rango en el que estámos desplegando POIs, y recalculamos la escala 
+     * @param r
+     */
+    public static void setRange(int r) {
+        scale = (float) radius / r;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-
         canvas.drawCircle(xPosition, yPosition, radius, radarPaint);
-        canvas.drawText(directionText, xPosition - 20, yPosition - radius + 10, directionTextPaint);
-        canvas.drawLine(xPosition, yPosition, (int) (Math.cos(Math.toRadians(225)) * radius) + xPosition, (int) (Math.sin(Math.toRadians(225)) * radius) + yPosition, radarLinesPaint);
-        canvas.drawLine(xPosition, yPosition, (int) (Math.cos(Math.toRadians(315)) * radius) + xPosition, (int) (Math.sin(Math.toRadians(315)) * radius) + yPosition, radarLinesPaint);
+        canvas.drawArc(semiCircleRect, 225, 90, true, semiCirclePaint);
+        canvas.drawText(directionText, directionTextXPos, directionTextYPos, directionTextPaint);
+        canvas.drawLine(xPosition, yPosition, radarLineLeftXEndPos, radarLineLeftYEndPos, radarLinesPaint);
+        canvas.drawLine(xPosition, yPosition, radarLineRightXEndPos, radarLineRightYEndPos, radarLinesPaint);
         for (POI poi : ARLayer.poiList) {
-            canvas.drawCircle((float) (Math.cos(Math.toRadians(poi.getAzimuth() + 270 - direction)) * poi.getDistance() * scale) + xPosition, (float) (Math.sin(Math.toRadians(poi.getAzimuth() + 270 - direction)) * poi.getDistance() * scale) + yPosition, 2, poiNotInSightPaint);
-            Log.d("radar", "dibujando " + poi.getName() + " en: " + (float) (Math.cos(Math.toRadians(poi.getAzimuth() + 270 + direction)) * poi.getDistance() * scale) + xPosition + ", " + (float) (Math.sin(Math.toRadians(poi.getAzimuth() + 270 + direction)) * poi.getDistance() * scale) + yPosition);
+            canvas.drawCircle((float) (Math.cos(Math.toRadians(poi.getAzimuth() + 270 - direction)) * poi.getDistance() * scale) + xPosition,
+                    (float) (Math.sin(Math.toRadians(poi.getAzimuth() + 270 - direction)) * poi.getDistance() * scale) + yPosition,
+                    2, poiNotInSightPaint);
         }
-
         super.onDraw(canvas);
     }
 }
