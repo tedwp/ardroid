@@ -49,7 +49,7 @@ public class TestPOIDrawing {
 		ARLayer.poiList.add(p3);
 		ARLayer.poiList.add(p4);
 		ARLayer.poiList.add(p5);
-		ARLayer.poiList.add(p6);
+//		ARLayer.poiList.add(p6);
 		ARLayer.poiList.add(p7);
 	}
 }

@@ -64,6 +64,12 @@ public class Main extends Activity {
         addContentView(arLayer, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT,
                 ViewGroup.LayoutParams.FILL_PARENT));
+
+
+        addContentView(new Radar(), new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.FILL_PARENT,
+                ViewGroup.LayoutParams.FILL_PARENT));
+
     }
 
     /**
@@ -105,10 +111,10 @@ public class Main extends Activity {
                                 dismissDialog(DIALOG_GPS_DISABLED);
                                 startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                             }
-                        }).setNegativeButton(R.string.exit, new DialogInterface.OnClickListener(){
+                        }).setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialogInterface, int i) {
-                            finish();
+                        finish();
                     }
                 });
                 return builder.create();
