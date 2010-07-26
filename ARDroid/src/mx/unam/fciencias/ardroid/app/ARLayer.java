@@ -198,6 +198,7 @@ public class ARLayer extends View {
                 } else {
                     updatePOILayout(null);
                 }
+                Radar.direction = direction;
                 postInvalidate();
             }
 
@@ -274,6 +275,11 @@ public class ARLayer extends View {
         return inclination + CAMERA_ANGLE_VERTICAL_HALF;
     }
 
+    /**
+     * Calcula la posición en y de un POI
+     * @param inc Inclinación
+     * @return Posición en y del POI
+     */
     private float yPosition(float inc) {
         float y;
         float ua = upperArm();
@@ -289,6 +295,11 @@ public class ARLayer extends View {
         return (y * screenHeight) / CAMERA_ANGLE_VERTICAL;
     }
 
+    /**
+     * Actualizamos la ubicación de los POI, cambiamos deviceLocation,
+     * y volvemos a calcular sus distancias y azimuth
+     * @param location
+     */
     private void updatePOILocation(Location location) {
         if (location != null) {
             Log.d("gps",

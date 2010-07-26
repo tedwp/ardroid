@@ -61,7 +61,6 @@
                 android:textColor="#FFFFFFFF"
                 />
     </RelativeLayout>
-
     <WebView
             android:id="@+id/webView"
             android:layout_width="fill_parent"
