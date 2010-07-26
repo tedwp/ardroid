@@ -46,8 +46,8 @@ public class ARLayer extends View {
      */
     private boolean locationChanged = false;
 
-    private int screenWidth;
-    private int screenHeight;
+    public static int screenWidth;
+    public static int screenHeight;
 
     private LocationManager locationManager;
     private SensorManager sensorManager;
@@ -198,7 +198,7 @@ public class ARLayer extends View {
                 } else {
                     updatePOILayout(null);
                 }
-                Radar.direction = direction;
+                Radar.setDirection(direction);
                 postInvalidate();
             }
 
@@ -298,7 +298,7 @@ public class ARLayer extends View {
     /**
      * Actualizamos la ubicación de los POI, cambiamos deviceLocation,
      * y volvemos a calcular sus distancias y azimuth
-     * @param location
+     * @param location Ubicación del dispositivo
      */
     private void updatePOILocation(Location location) {
         if (location != null) {
