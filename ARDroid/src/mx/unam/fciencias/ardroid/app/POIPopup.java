@@ -9,9 +9,9 @@ import android.webkit.WebViewClient;
 import android.widget.*;
 
 /**
- * Clase que despliega información adicional de un POI cargandola desde una página web.
+ * Clase que despliega informaci√≥n adicional de un POI cargandola desde una p√°gina web.
  *
- * @author Sebastián García Anderman
+ * @author Sebasti√°n Garc√≠a Anderman
  */
 public class POIPopup extends PopupWindow {
 
@@ -36,8 +36,8 @@ public class POIPopup extends PopupWindow {
         this.setHeight(screenHeight - (screenHeight / 40));
 
         /**
-         * Cambiamos la animación de esta <code>PopupWindow</code> para que
-         * aparezca deslizándose desde abajo y desaparezca deslizándose hacia abajo
+         * Cambiamos la animaci√≥n de esta <code>PopupWindow</code> para que
+         * aparezca desliz√°ndose desde abajo y desaparezca desliz√°ndose hacia abajo
          */
         this.setAnimationStyle(R.style.Animation_Popup);
         this.setFocusable(true);
@@ -50,7 +50,7 @@ public class POIPopup extends PopupWindow {
         progressBarLayout = (RelativeLayout) view.findViewById(R.id.progressbar_layout);
 
         /**
-         * Cuando se aprieta este botón cerramos el <code>POIPopup</code>
+         * Cuando se aprieta este bot√≥n cerramos el <code>POIPopup</code>
          */
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -74,7 +74,7 @@ public class POIPopup extends PopupWindow {
         webView.setWebChromeClient(new WebChromeClient() {
 
             /**
-             * Desplegamos el progreso de carga de esta página, cuando llega al 100%
+             * Desplegamos el progreso de carga de esta p√°gina, cuando llega al 100%
              * desaparecemos la <code>ProgressBar</code>
              * @param view
              * @param progress
@@ -94,7 +94,7 @@ public class POIPopup extends PopupWindow {
     }
 
     /**
-     * Es igual que el método padre, simplemente prendemos una bandera
+     * Es igual que el m√©todo padre, simplemente prendemos una bandera
      * para evitar que se despliegue dos veces
      *
      * @param parent
@@ -117,20 +117,20 @@ public class POIPopup extends PopupWindow {
     }
 
     /**
-     * Mostramos esta <code>POIPopup</code> de acuerdo al <code>POI</code> que recibamos como parámetro
+     * Mostramos esta <code>POIPopup</code> de acuerdo al <code>POI</code> que recibamos como par√°metro
      *
-     * @param poi POI sobre el cual debemos desplegar información extra
+     * @param poi POI sobre el cual debemos desplegar informaci√≥n extra
      */
     public void show(POI poi) {
         poiTitle.setText(poi.getName());
         poiDistance.setText(Main.context.getText(R.string.distance_text_popup) + " " + Float.toString(poi.getDistance()) + "m");
         /**
-         * Antes de cargar la nueva página ponemos el WebView en blanco
-         * para borrar la página cargada en otra llamada a este método
+         * Antes de cargar la nueva p√°gina ponemos el WebView en blanco
+         * para borrar la p√°gina cargada en otra llamada a este m√©todo
          */
         webView.loadData("", "text/html", "utf-8");
         /**
-         * En caso de que el POI no tenga un URL con información extra notificamos al usuario de esto.
+         * En caso de que el POI no tenga un URL con informaci√≥n extra notificamos al usuario de esto.
          */
         if (poi.getInfoUrl() != null) {
             progressBarLayout.setVisibility(ProgressBar.VISIBLE);

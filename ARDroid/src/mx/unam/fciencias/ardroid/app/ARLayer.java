@@ -179,8 +179,6 @@ public class ARLayer extends View {
                 if (direction > 360) {
                     direction -= 360;
                 }
-//                Log.d("gps", "direction: " + direction);
-//                Log.d("gps", "directionr: " + event.values[0]);
             }
 
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {

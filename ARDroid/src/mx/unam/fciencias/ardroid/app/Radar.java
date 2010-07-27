@@ -7,9 +7,9 @@ import android.graphics.RectF;
 import android.view.View;
 
 /**
- * Clase que muestra un radar en pantalla con los POI en la dirección en que se encuentran
+ * Clase que muestra un radar en pantalla con los POI en la direcci√≥n en que se encuentran
  *
- * @author Sebastián García Anderman
+ * @author Sebasti√°n Garc√≠a Anderman
  */
 public class Radar extends View {
 
@@ -43,7 +43,7 @@ public class Radar extends View {
     /**
      * Construimos el Radar
      *
-     * @param screenHeight Altura de la pantalla en orientación landscape
+     * @param screenHeight Altura de la pantalla en orientaci√≥n landscape
      */
     public Radar(int screenHeight) {
         super(Main.context);
@@ -105,16 +105,16 @@ public class Radar extends View {
     }
 
     /**
-     * Ponemos la dirección en la que está viendo el teléfono
-     * @param dir Dirección a la que apunta el teléfono
+     * Ponemos la direcci√≥n en la que est√° viendo el tel√≥fono
+     * @param dir Direcci√≥n a la que apunta el tel√≥fono
      */
     public static void setDirection(float dir) {
         direction = dir;
-        directionText = (int) dir + "º";
+        directionText = (int) dir + "¬∫";
     }
 
     /**
-     * Cambiamos el rango en el que estámos desplegando POIs, y recalculamos la escala 
+     * Cambiamos el rango en el que est√°mos desplegando POIs, y recalculamos la escala
      * @param r
      */
     public static void setRange(int r) {

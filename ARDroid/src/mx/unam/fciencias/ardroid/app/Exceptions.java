@@ -1,8 +1,8 @@
 package mx.unam.fciencias.ardroid.app;
 
 /**
- * Creado por: Sebastián García Anderman
- * UNAM | Facultad de Ciencias | Ciencias de la Computación
+ * Creado por: Sebasti√°n Garc√≠a Anderman
+ * UNAM | Facultad de Ciencias | Ciencias de la Computaci√≥n
  * Fecha: 22-jul-2010
  */
 
