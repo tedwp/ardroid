@@ -42,12 +42,10 @@ public class Radar extends View {
 
     /**
      * Construimos el Radar
-     *
-     * @param screenHeight Altura de la pantalla en orientación landscape
      */
-    public Radar(int screenHeight) {
+    public Radar() {
         super(Main.context);
-        calcDimensions(screenHeight);
+        calcDimensions(ARLayer.screenHeight);
         initPaints();
     }
 
@@ -55,14 +53,13 @@ public class Radar extends View {
      * Calculamos las dimensiones del radar, es 12.5% de la altura de la pantalla.
      * Calculamos las posiciones de los distintos elementos del radar.
      *
-     * @param screenHeight
+     * @param screenHeight Altura de la pantalla en modo landscape
      */
     private void calcDimensions(int screenHeight) {
         radius = screenHeight / 8;
         xPosition = radius + 10;
         yPosition = radius + 10;
         direction = 0;
-        range = 100;
         scale = (float) radius / range;
 
         directionTextXPos = xPosition;
@@ -71,6 +68,8 @@ public class Radar extends View {
         radarLineLeftYEndPos = (float) (Math.sin(Math.toRadians(225)) * radius) + yPosition;
         radarLineRightXEndPos = (float) (Math.cos(Math.toRadians(315)) * radius) + xPosition;
         radarLineRightYEndPos = (float) (Math.sin(Math.toRadians(315)) * radius) + yPosition;
+
+        setRange();
     }
 
     /**
@@ -106,6 +105,7 @@ public class Radar extends View {
 
     /**
      * Ponemos la dirección en la que está viendo el telófono
+     *
      * @param dir Dirección a la que apunta el telófono
      */
     public static void setDirection(float dir) {
@@ -115,10 +115,10 @@ public class Radar extends View {
 
     /**
      * Cambiamos el rango en el que estámos desplegando POIs, y recalculamos la escala
-     * @param r
+     *
      */
-    public static void setRange(int r) {
-        scale = (float) radius / r;
+    public static void setRange() {
+        scale = (float) radius / ARLayer.range;
     }
 
     @Override
@@ -129,9 +129,11 @@ public class Radar extends View {
         canvas.drawLine(xPosition, yPosition, radarLineLeftXEndPos, radarLineLeftYEndPos, radarLinesPaint);
         canvas.drawLine(xPosition, yPosition, radarLineRightXEndPos, radarLineRightYEndPos, radarLinesPaint);
         for (POI poi : ARLayer.poiList) {
-            canvas.drawCircle((float) (Math.cos(Math.toRadians(poi.getAzimuth() + 270 - direction)) * poi.getDistance() * scale) + xPosition,
-                    (float) (Math.sin(Math.toRadians(poi.getAzimuth() + 270 - direction)) * poi.getDistance() * scale) + yPosition,
-                    2, poiNotInSightPaint);
+            if (poi.isVisibleInRange()) {
+                canvas.drawCircle((float) (Math.cos(Math.toRadians(poi.getAzimuth() + 270 - direction)) * poi.getDistance() * scale) + xPosition,
+                        (float) (Math.sin(Math.toRadians(poi.getAzimuth() + 270 - direction)) * poi.getDistance() * scale) + yPosition,
+                        2, poiNotInSightPaint);
+            }
         }
         super.onDraw(canvas);
     }

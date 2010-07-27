@@ -60,6 +60,8 @@ public class POI extends View {
     private int poiHalfWidth;
     private int poiHalfHeight;
 
+    private boolean isVisibleInRange = false;
+
     /**
      * Instantiates a new pOI.
      *
@@ -102,16 +104,21 @@ public class POI extends View {
     public void updateValues() {
         if (poiLocation != null && POI.deviceLocation != null) {
             azimuth = POI.deviceLocation.bearingTo(poiLocation);
-            Log.d("gps", "poi: " + poiLocation.getLatitude() + " ," + poiLocation.getLongitude());
-            Log.d("gps", "device: " + POI.deviceLocation.getLatitude() + " ," + POI.deviceLocation.getLongitude());
-            Log.d("gps", "azumuth: " + name + " :" + azimuth);
             if (azimuth < 0) {
                 azimuth += 360;
             }
-            Log.d("gps", "azumuth: " + name + " :" + azimuth);
             distance = POI.deviceLocation.distanceTo(poiLocation);
-            Log.d("gps", "distance: " + name + " :" + distance);
+            updateVisibilityInRange();
+            Log.d("rang", name + " " + isVisibleInRange);
             setInclination();
+        }
+    }
+
+    public void updateVisibilityInRange() {
+        if (distance <= ARLayer.range) {
+            isVisibleInRange = true;
+        } else {
+            isVisibleInRange = false;
         }
     }
 
@@ -217,5 +224,9 @@ public class POI extends View {
 
     public String getInfoUrl() {
         return infoUrl;
+    }
+
+    public boolean isVisibleInRange() {
+        return isVisibleInRange;
     }
 }
