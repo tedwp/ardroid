@@ -8,9 +8,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 /**
  * Actividad principal de la aplicación.
@@ -64,10 +66,12 @@ public class Main extends Activity {
         addContentView(arLayer, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT,
                 ViewGroup.LayoutParams.FILL_PARENT));
-        addContentView(new Radar(ARLayer.screenHeight), new ViewGroup.LayoutParams(
+        addContentView(new Radar(), new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
-
+        addContentView(new RangeSeekBar(), new FrameLayout.LayoutParams(
+					FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
+					Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
     }
 
     /**

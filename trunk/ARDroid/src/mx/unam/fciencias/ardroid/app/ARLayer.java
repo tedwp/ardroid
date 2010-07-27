@@ -12,7 +12,10 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
+import android.view.Display;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +69,11 @@ public class ARLayer extends View {
     public static View arView;
 
     public static POIPopup poiPopup;
+
+    /**
+     * Rango en el cual vamos a buscar POI a desplegar
+     */
+    public static int range = 1000;
 
     /**
      * Constructor
@@ -179,6 +187,7 @@ public class ARLayer extends View {
                 if (direction > 360) {
                     direction -= 360;
                 }
+                Log.d("filter", Float.toString(direction));
             }
 
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -275,6 +284,7 @@ public class ARLayer extends View {
 
     /**
      * Calcula la posición en y de un POI
+     *
      * @param inc Inclinación
      * @return Posición en y del POI
      */
@@ -296,6 +306,7 @@ public class ARLayer extends View {
     /**
      * Actualizamos la ubicación de los POI, cambiamos deviceLocation,
      * y volvemos a calcular sus distancias y azimuth
+     *
      * @param location Ubicación del dispositivo
      */
     private void updatePOILocation(Location location) {
@@ -307,6 +318,7 @@ public class ARLayer extends View {
             for (POI poi : poiList) {
                 poi.updateValues();
             }
+            Radar.setRange();
         } else {
             Log.d("gps", "Actualizando con location null");
         }
@@ -329,7 +341,6 @@ public class ARLayer extends View {
             int x = Math.round(xPosition(poi.getAzimuth()));
             int y = Math.round(yPosition(poi.getInclination()));
 
-            // TODO: Ajustar los valores que se suman y restan
             poi.poiLayout(x, y, x, y);
         }
     }
@@ -343,7 +354,9 @@ public class ARLayer extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         for (POI poi : poiList) {
-            poi.draw(canvas);
+            if (poi.isVisibleInRange()) {
+                poi.draw(canvas);
+            }
         }
         super.onDraw(canvas);
     }
