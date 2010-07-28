@@ -24,7 +24,7 @@ public class RangeSeekBar extends LinearLayout {
 
         seekBar = (SeekBar) findViewById(R.id.seek_bar);
         seekBar.setMax(200);
-        seekBar.setProgress(50);
+        seekBar.setProgress(ARLayer.range/100);
         seekBar.setOnSeekBarChangeListener(rangeSeekBarListener);
 
         textView = (TextView) findViewById(R.id.seek_bar_text);
