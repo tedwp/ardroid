@@ -25,7 +25,6 @@ public class Radar extends View {
 
     public static float direction;
 
-    private float range;
     private static float scale;
 
     private static String directionText = "";
@@ -60,7 +59,7 @@ public class Radar extends View {
         xPosition = radius + 10;
         yPosition = radius + 10;
         direction = 0;
-        scale = (float) radius / range;
+        scale = (float) radius / ARLayer.range;
 
         directionTextXPos = xPosition;
         directionTextYPos = yPosition - radius + 10;
@@ -69,7 +68,7 @@ public class Radar extends View {
         radarLineRightXEndPos = (float) (Math.cos(Math.toRadians(315)) * radius) + xPosition;
         radarLineRightYEndPos = (float) (Math.sin(Math.toRadians(315)) * radius) + yPosition;
 
-        setRange();
+        setScale();
     }
 
     /**
@@ -115,9 +114,8 @@ public class Radar extends View {
 
     /**
      * Cambiamos el rango en el que estámos desplegando POIs, y recalculamos la escala
-     *
      */
-    public static void setRange() {
+    public static void setScale() {
         scale = (float) radius / ARLayer.range;
     }
 

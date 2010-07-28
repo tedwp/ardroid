@@ -69,9 +69,9 @@ public class Main extends Activity {
         addContentView(new Radar(), new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
-        addContentView(new RangeSeekBar(), new FrameLayout.LayoutParams(
+        addContentView(new VerticalRangeSeekBar(), new FrameLayout.LayoutParams(
 					FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
-					Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
+					Gravity.RIGHT | Gravity.CENTER_VERTICAL));
     }
 
     /**
