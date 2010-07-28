@@ -318,7 +318,7 @@ public class ARLayer extends View {
             for (POI poi : poiList) {
                 poi.updateValues();
             }
-            Radar.setRange();
+            Radar.setScale();
         } else {
             Log.d("gps", "Actualizando con location null");
         }
