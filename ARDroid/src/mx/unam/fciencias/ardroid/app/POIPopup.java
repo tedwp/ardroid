@@ -8,6 +8,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.*;
 
+import java.text.DecimalFormat;
+
 /**
  * Clase que despliega información adicional de un POI cargandola desde una página web.
  *
@@ -123,7 +125,8 @@ public class POIPopup extends PopupWindow {
      */
     public void show(POI poi) {
         poiTitle.setText(poi.getName());
-        poiDistance.setText(Main.context.getText(R.string.distance_text_popup) + " " + Float.toString(poi.getDistance()) + "m");
+        DecimalFormat twoDForm = new DecimalFormat("#,##");
+        poiDistance.setText(Main.context.getText(R.string.distance_text_popup) + " " + twoDForm.format(poi.getDistance()) + "m");
         /**
          * Antes de cargar la nueva página ponemos el WebView en blanco
          * para borrar la página cargada en otra llamada a este método

@@ -62,7 +62,7 @@ public class Main extends Activity {
      * Inicializamos las capas del programa.
      */
     private void initLayers() {
-        setContentView(cameraPreview);
+        //setContentView(cameraPreview);
         addContentView(arLayer, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT,
                 ViewGroup.LayoutParams.FILL_PARENT));
@@ -72,6 +72,11 @@ public class Main extends Activity {
         addContentView(new VerticalRangeSeekBar(), new FrameLayout.LayoutParams(
 					FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
 					Gravity.RIGHT | Gravity.CENTER_VERTICAL));
+        FrameLayout.LayoutParams accuracyDisplayLayoutParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.RIGHT | Gravity.TOP);
+        accuracyDisplayLayoutParams.setMargins(0,2,2,0);
+        addContentView(ARLayer.accuracyDisplay, accuracyDisplayLayoutParams);
     }
 
     /**
