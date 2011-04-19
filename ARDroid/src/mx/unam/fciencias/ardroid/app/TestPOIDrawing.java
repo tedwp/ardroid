@@ -44,7 +44,7 @@ public class TestPOIDrawing {
 		POI p7 = new POI(location7, null, "Cerro del Judío", "http://www.google.com");
 
 
-//		ARLayer.poiList.add(p1);
+		ARLayer.poiList.add(p1);
 		ARLayer.poiList.add(p2);
 		ARLayer.poiList.add(p3);
 		ARLayer.poiList.add(p4);
