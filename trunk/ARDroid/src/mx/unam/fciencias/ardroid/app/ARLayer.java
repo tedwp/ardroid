@@ -55,6 +55,9 @@ public class ARLayer extends View {
     private LocationManager locationManager;
     private SensorManager sensorManager;
 
+    private float[] valuesMagneticField = {0,0,0};
+    private float[] valuesAccelerometer = {0,0,0};
+
     /**
      * Lista de POI
      */
@@ -157,7 +160,7 @@ public class ARLayer extends View {
         sensorManager = (SensorManager) Main.context
                 .getSystemService(Context.SENSOR_SERVICE);
         sensorManager.registerListener(orientationListener,
-                sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(orientationListener,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
@@ -187,9 +190,34 @@ public class ARLayer extends View {
     final SensorEventListener orientationListener = new SensorEventListener() {
 
         public void onSensorChanged(SensorEvent event) {
-            if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
+            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+
+                valuesMagneticField = event.values;
+                float[] valores = new float[3];
+                float[] matrizDeRotacion = new float[9];
+                SensorManager.getRotationMatrix(matrizDeRotacion, null,
+                        valuesAccelerometer, valuesMagneticField);
+
+                float[] matrizDeRotacion2 = new float[9];
+                SensorManager.remapCoordinateSystem(matrizDeRotacion,
+                        SensorManager.AXIS_X, SensorManager.AXIS_Z,
+                        matrizDeRotacion2);
+
+                SensorManager.getOrientation(matrizDeRotacion2, valores);
+                //Convertimos de radianes a grados
+                float orientacion = (float) Math.toDegrees(valores[0]);
+
+
+                direction = orientacion; //+ 90;
+                if (direction < 0) {
+                    direction = 360 + direction;
+                }
+                Log.d("filter", "dirprev: "+direction);
+
+
+
                 direction = SensorAvgFilter
-                        .orientationListener(event.values[0]) + 90;
+                        .orientationListener(direction);
                 if (direction > 360) {
                     direction -= 360;
                 }
@@ -197,6 +225,7 @@ public class ARLayer extends View {
             }
 
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                valuesAccelerometer = event.values;
                 inclination = SensorAvgFilter.accelerometerListener(
                         event.values[0], event.values[2]);
 

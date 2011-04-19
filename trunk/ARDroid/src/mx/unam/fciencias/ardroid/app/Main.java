@@ -62,7 +62,7 @@ public class Main extends Activity {
      * Inicializamos las capas del programa.
      */
     private void initLayers() {
-        //setContentView(cameraPreview);
+        setContentView(cameraPreview);
         addContentView(arLayer, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT,
                 ViewGroup.LayoutParams.FILL_PARENT));
