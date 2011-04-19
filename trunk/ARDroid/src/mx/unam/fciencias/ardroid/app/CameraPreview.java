@@ -138,9 +138,13 @@ public class CameraPreview extends SurfaceView implements
         } else {
             List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
             Camera.Size optimalSize = getOptimalPreviewSize(sizes, w, h);
-            parameters.setPreviewSize(optimalSize.width, optimalSize.height);
-            Log.d("optimalSize", "W: " + optimalSize.width + ", H: "
-                    + optimalSize.height);
+            if (optimalSize == null) {
+                parameters.setPreviewSize(w, h);
+            } else {
+                Log.d("optimalSize", "W: " + optimalSize.width + ", H: "
+                        + optimalSize.height);
+                parameters.setPreviewSize(optimalSize.width, optimalSize.height);
+            }
         }
         camera.setParameters(parameters);
         camera.startPreview();

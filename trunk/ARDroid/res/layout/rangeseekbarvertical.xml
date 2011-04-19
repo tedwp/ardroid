@@ -19,7 +19,7 @@
     <mx.unam.fciencias.ardroid.gui.verticalseekbar.VerticalSeekBar
             android:id="@+id/vertical_seek_bar"
             android:layout_width="wrap_content"
-            android:layout_height="150sp"
+            android:layout_height="250sp"
             android:progressDrawable="@drawable/progress_vertical"
             android:thumb="@drawable/seek_thumb"
             />

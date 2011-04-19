@@ -66,14 +66,19 @@ public class ARLayer extends View {
     private static final float CAMERA_ANGLE_HORIZONTAL_HALF = CAMERA_ANGLE_HORIZONTAL / 2;
     private static final float CAMERA_ANGLE_VERTICAL_HALF = CAMERA_ANGLE_VERTICAL / 2;
 
+    /**
+     * Utilizamos esta vista para poder desplegar el POIPopup
+     */
     public static View arView;
 
     public static POIPopup poiPopup;
 
     /**
-     * Rango en el cual vamos a buscar POI a desplegar
+     * Rango en el cual vamos a buscar POI a desplegar, fijado en metros
      */
     public static int range = 1000;
+
+    public static AccuracyDisplay accuracyDisplay;
 
     /**
      * Constructor
@@ -86,6 +91,7 @@ public class ARLayer extends View {
         // TODO: Checar si necesita ser synchronized o no hace falta.
         SensorAvgFilter.initAvgArrays();
         arView = this;
+        accuracyDisplay = new AccuracyDisplay();
     }
 
     public void onStart() throws LocationProviderNullException {
@@ -132,7 +138,7 @@ public class ARLayer extends View {
             throw new LocationProviderNullException();
         }
         Log.d("gps", "provider: " + provider);
-        locationManager.requestLocationUpdates(provider, 30000, 5,
+        locationManager.requestLocationUpdates(provider, 30000, 2,
                 locationListener);
         updatePOILocation(locationManager.getLastKnownLocation(provider));
     }
@@ -226,6 +232,7 @@ public class ARLayer extends View {
             Log.d("gps2", "cambio la ubicacion: " + location.getLatitude()
                     + ", " + location.getLongitude() + ", altitude: " + location.getAltitude());
             locationChanged = true;
+            accuracyDisplay.changeAccuracy(location.getAccuracy());
         }
 
         public void onProviderDisabled(String provider) {

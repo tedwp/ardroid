@@ -1,9 +1,6 @@
 package mx.unam.fciencias.ardroid.app;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Region;
+import android.graphics.*;
 import android.location.Location;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -62,6 +59,8 @@ public class POI extends View {
 
     private boolean isVisibleInRange = false;
 
+    private RadialGradient rg;
+
     /**
      * Instantiates a new pOI.
      *
@@ -94,6 +93,8 @@ public class POI extends View {
         paint1 = new Paint();
         paint1.setColor(Color.RED);
         paint1.setAntiAlias(true);
+        paint1.setStyle(Paint.Style.STROKE);
+        paint1.setStrokeWidth(6);
         paint2 = new Paint();
         paint2.setColor(Color.WHITE);
         paint2.setAntiAlias(true);

@@ -24,6 +24,7 @@ public class VerticalRangeSeekBar extends LinearLayout {
 
         seekBar = (VerticalSeekBar) findViewById(R.id.vertical_seek_bar);
         seekBar.setMax(1000);
+        //Rango en el que se encontrará la barra por defecto
         seekBar.setProgress((int) (Math.sqrt(ARLayer.range)*10));
         seekBar.setOnSeekBarChangeListener(rangeSeekBarListener);
 

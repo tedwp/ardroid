@@ -158,12 +158,15 @@ public class SensorAvgFilter {
         avgRollingX.add(v0);
         avgRollingX.remove(0);
 
+        //Si uno de los ejes i.e. Z es cero, entonces es porque el dispositivo
+        //está paralelo a ese eje, entonces la inclinación debería ser 0 o 180,
+        //dependiendo del eje x
         if (avgRollZSum != 0.0) {
             avgInclination = (float) Math.atan(avgRollXSum / avgRollZSum);
-        } else if (avgRollXSum < 0) {
-            avgInclination = (float) (Math.PI / 2.0);
-        } else if (avgRollXSum >= 0) {
-            avgInclination = (float) (3 * Math.PI / 2.0);
+        } else if (avgRollXSum <= 0) {
+            avgInclination = (float) (Math.PI / 2.0); //90 grados, 0 después de girar
+        } else if (avgRollXSum > 0) {
+            avgInclination = (float) (3 * Math.PI / 2.0); //270 grados, 180 después de girar
         }
 
         // convert to degress
