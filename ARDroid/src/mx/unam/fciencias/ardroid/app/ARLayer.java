@@ -55,8 +55,8 @@ public class ARLayer extends View {
     private LocationManager locationManager;
     private SensorManager sensorManager;
 
-    private float[] valuesMagneticField = {0,0,0};
-    private float[] valuesAccelerometer = {0,0,0};
+    private float[] valuesMagneticField = {0, 0, 0};
+    private float[] valuesAccelerometer = {0, 0, 0};
 
     /**
      * Lista de POI
@@ -184,6 +184,54 @@ public class ARLayer extends View {
             sensorManager.unregisterListener(orientationListener);
     }
 
+    private float computeDirection() {
+        float[] valores = new float[3];
+        float[] matrizDeRotacion = new float[9];
+        SensorManager.getRotationMatrix(matrizDeRotacion, null,
+                valuesAccelerometer, valuesMagneticField);
+
+        float[] matrizDeRotacion2 = new float[9];
+        SensorManager.remapCoordinateSystem(matrizDeRotacion,
+                SensorManager.AXIS_X, SensorManager.AXIS_Z,
+                matrizDeRotacion2);
+
+        SensorManager.getOrientation(matrizDeRotacion2, valores);
+
+        //Convertimos de radianes a grados
+        direction = (float) Math.toDegrees(valores[0]);
+        Log.d("filter2", "Dir: " + direction);
+        if (direction < 0) {
+            direction = 360 + direction;
+        }else if(direction >=360){
+            direction = direction - 360;
+        }
+        return direction;
+    }
+
+    private float computeInclination(float rollingX, float rollingZ) {
+        //Si uno de los ejes i.e. Z es cero, entonces es porque el dispositivo
+        //está paralelo a ese eje, entonces la inclinación debería ser 0 o 180,
+        //dependiendo del eje x
+        if (rollingZ != 0.0) {
+            inclination = (float) Math.atan(rollingX / rollingZ);
+        } else if (rollingX <= 0) {
+            inclination = (float) (Math.PI / 2.0);
+        } else if (rollingX > 0) {
+            inclination = (float) (3 * Math.PI / 2.0);
+        }
+
+        // convert to degress
+        inclination = (float) (inclination * (360 / (2 * Math.PI)));
+
+        // flip!
+        if (inclination < 0) {
+            inclination = inclination + 90;
+        } else {
+            inclination = inclination - 90;
+        }
+        return inclination;
+    }
+
     /**
      * The orientation listener.
      */
@@ -191,48 +239,25 @@ public class ARLayer extends View {
 
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-
                 valuesMagneticField = event.values;
-                float[] valores = new float[3];
-                float[] matrizDeRotacion = new float[9];
-                SensorManager.getRotationMatrix(matrizDeRotacion, null,
-                        valuesAccelerometer, valuesMagneticField);
-
-                float[] matrizDeRotacion2 = new float[9];
-                SensorManager.remapCoordinateSystem(matrizDeRotacion,
-                        SensorManager.AXIS_X, SensorManager.AXIS_Z,
-                        matrizDeRotacion2);
-
-                SensorManager.getOrientation(matrizDeRotacion2, valores);
-                //Convertimos de radianes a grados
-                float orientacion = (float) Math.toDegrees(valores[0]);
 
 
-                direction = orientacion; //+ 90;
-                if (direction < 0) {
-                    direction = 360 + direction;
-                }
-                Log.d("filter", "dirprev: "+direction);
-
-
-
-                direction = SensorAvgFilter
-                        .orientationListener(direction);
-                if (direction > 360) {
-                    direction -= 360;
-                }
-                Log.d("filter", Float.toString(direction));
+                //direction = SensorOptimalFilter.filterDirection(computeDirection());
+                Log.d("cambio", "Dir1: "+direction);
+                direction = SensorAvgFilter.orientationListener(computeDirection());
+                Log.d("cambio", "Dir2: "+direction);
             }
 
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 valuesAccelerometer = event.values;
-                inclination = SensorAvgFilter.accelerometerListener(
-                        event.values[0], event.values[2]);
+
+                inclination = SensorOptimalFilter.filterInclination(computeInclination(event.values[0], event.values[2]));
 
             }
 
-            if (SensorAvgFilter.directionChanged
-                    || SensorAvgFilter.inclinationChanged) {
+
+            if (SensorOptimalFilter.directionChanged
+                    || SensorOptimalFilter.inclinationChanged || SensorAvgFilter.directionChanged || SensorAvgFilter.inclinationChanged) {
                 if (locationChanged) {
                     Log.d("gps", "Location changed, updating");
                     updatePOILayout(currentLocation);
