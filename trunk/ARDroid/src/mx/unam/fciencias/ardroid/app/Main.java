@@ -7,12 +7,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import mx.unam.fciencias.ardroid.app.POISources.GeoNamesPOISource;
+import mx.unam.fciencias.ardroid.app.POISources.POISource;
 
 /**
  * Actividad principal de la aplicación.
@@ -42,6 +45,7 @@ public class Main extends Activity {
     private ARLayer arLayer;
 
     private static final int DIALOG_GPS_DISABLED = 0;
+    private static final int DIALOG_MOVIL_DATA_DISABLED = 1;
 
     /**
      * Se llama cuando la actividad se crea por primera vez.
@@ -55,7 +59,15 @@ public class Main extends Activity {
         initWindowParameters();
         initComponents();
         initLayers();
+        checkInternetConnection();
         TestPOIDrawing.testDrawPOI();
+    }
+
+    private void checkInternetConnection() {
+        //Si no hay conexión a internet pedimos al usuario que la habilite.
+        if (!HttpConnection.isOnline()) {
+            showDialog(DIALOG_MOVIL_DATA_DISABLED);
+        }
     }
 
     /**
@@ -70,12 +82,12 @@ public class Main extends Activity {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         addContentView(new VerticalRangeSeekBar(), new FrameLayout.LayoutParams(
-					FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
-					Gravity.RIGHT | Gravity.CENTER_VERTICAL));
+                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.RIGHT | Gravity.CENTER_VERTICAL));
         FrameLayout.LayoutParams accuracyDisplayLayoutParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.RIGHT | Gravity.TOP);
-        accuracyDisplayLayoutParams.setMargins(0,2,2,0);
+        accuracyDisplayLayoutParams.setMargins(0, 2, 2, 0);
         addContentView(ARLayer.accuracyDisplay, accuracyDisplayLayoutParams);
     }
 
@@ -127,6 +139,23 @@ public class Main extends Activity {
                     }
                 });
                 return builder.create();
+            case DIALOG_MOVIL_DATA_DISABLED:
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+                builder2.setMessage(R.string.movil_data_disabled_dialog_text).setTitle(R.string.movil_data_disabled_dialog_title)
+                        .setCancelable(false).setPositiveButton(R.string.yes,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int id) {
+                                dismissDialog(DIALOG_MOVIL_DATA_DISABLED);
+                                startActivityForResult(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS), 0);
+                            }
+                        }).setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                });
+                return builder2.create();
             default:
                 return null;
         }

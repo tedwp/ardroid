@@ -10,12 +10,15 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import mx.unam.fciencias.ardroid.app.POISources.GeoNamesPOISource;
+import mx.unam.fciencias.ardroid.app.POISources.POISource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +85,11 @@ public class ARLayer extends View {
     public static int range = 1000;
 
     public static AccuracyDisplay accuracyDisplay;
+
+    /**
+     * Lo usamos para esperar a tener una buena precisión en la ubicación para empezar a bajar los datos de los POIs
+     */
+    private boolean poiDownloadStarted = false;
 
     /**
      * Constructor
@@ -202,7 +210,7 @@ public class ARLayer extends View {
         Log.d("filter2", "Dir: " + direction);
         if (direction < 0) {
             direction = 360 + direction;
-        }else if(direction >=360){
+        } else if (direction >= 360) {
             direction = direction - 360;
         }
         return direction;
@@ -243,9 +251,9 @@ public class ARLayer extends View {
 
 
                 //direction = SensorOptimalFilter.filterDirection(computeDirection());
-                Log.d("cambio", "Dir1: "+direction);
+                Log.d("cambio", "Dir1: " + direction);
                 direction = SensorAvgFilter.orientationListener(computeDirection());
-                Log.d("cambio", "Dir2: "+direction);
+                Log.d("cambio", "Dir2: " + direction);
             }
 
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -286,7 +294,12 @@ public class ARLayer extends View {
             Log.d("gps2", "cambio la ubicacion: " + location.getLatitude()
                     + ", " + location.getLongitude() + ", altitude: " + location.getAltitude());
             locationChanged = true;
-            accuracyDisplay.changeAccuracy(location.getAccuracy());
+            float accuracy = location.getAccuracy();
+            if(accuracy<50 && !poiDownloadStarted){
+                poiDownloadStarted = true;
+                new DownloadPOIData().execute(null, null, null);
+            }
+            accuracyDisplay.changeAccuracy(accuracy);
         }
 
         public void onProviderDisabled(String provider) {
@@ -429,5 +442,20 @@ public class ARLayer extends View {
             ret = poi.dispatchTouchEvent(event);
         }
         return ret;
+    }
+
+    //Class to login in a background thread
+    class DownloadPOIData extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            POISource geo = new GeoNamesPOISource();
+            geo.retrievePOIs();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void s) {
+        }
     }
 }

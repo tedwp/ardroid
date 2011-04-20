@@ -4,6 +4,8 @@
     <string name="app_name">ARDroid</string>
     <string name="gps_disabled_dialog_title">GPS</string>
     <string name="gps_disabled_dialog_text">ARDroid needs the GPS to be enabled in order to work.\nWould you like to enable it now?</string>
+    <string name="movil_data_disabled_dialog_title">Internet Disabled</string>
+    <string name="movil_data_disabled_dialog_text">ARDroid needs an active internet connection in order to work.\nWould you like to enable it now?</string>
     <string name="yes">Yes</string>
     <string name="exit">Exit</string>
     <string name="distance_text_popup">Distance:</string>
