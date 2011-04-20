@@ -22,6 +22,7 @@ import mx.unam.fciencias.ardroid.app.POISources.POISource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 // TODO: Auto-generated Javadoc
 
@@ -45,7 +46,7 @@ public class ARLayer extends View {
     /**
      * The current location.
      */
-    private Location currentLocation;
+    public static Location currentLocation;
 
     /**
      * The location changed.
@@ -64,7 +65,7 @@ public class ARLayer extends View {
     /**
      * Lista de POI
      */
-    public static List<POI> poiList;
+    public static CopyOnWriteArrayList<POI> poiList;
 
     private static final float CAMERA_ANGLE_HORIZONTAL = 49.55f;
     private static final float CAMERA_ANGLE_VERTICAL = 34.2f;
@@ -98,7 +99,8 @@ public class ARLayer extends View {
         super(Main.context);
         initLayout();
         initDrawComponents();
-        poiList = java.util.Collections.synchronizedList(new ArrayList<POI>());
+        //poiList = java.util.Collections.synchronizedList(new ArrayList<POI>());
+        poiList = new CopyOnWriteArrayList<POI>();
         // TODO: Checar si necesita ser synchronized o no hace falta.
         SensorAvgFilter.initAvgArrays();
         arView = this;
@@ -449,13 +451,16 @@ public class ARLayer extends View {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            double latitude = currentLocation.getLatitude();
+            double longitude = currentLocation.getLongitude();
             POISource geo = new GeoNamesPOISource();
-            geo.retrievePOIs();
+            geo.retrievePOIs(latitude, longitude);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void s) {
+            Log.d("poiData", "Se termino de bajar los POI");
         }
     }
 }

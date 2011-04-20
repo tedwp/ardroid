@@ -1,5 +1,9 @@
 package mx.unam.fciencias.ardroid.app.POISources;
 
+import android.location.Location;
+import mx.unam.fciencias.ardroid.app.ARLayer;
+import mx.unam.fciencias.ardroid.app.POI;
+
 /**
  * Created by IntelliJ IDEA.
  * User: lander
@@ -9,5 +13,13 @@ package mx.unam.fciencias.ardroid.app.POISources;
  */
 public abstract class POISource {
 
-    public abstract void retrievePOIs();
+    public abstract void retrievePOIs(double latitude, double longitude);
+
+    protected void createPOIAndAddToLis(double latitude, double longitude, String provider, String title, String url) {
+        Location location = new Location(provider);
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        POI poi = new POI(location, ARLayer.currentLocation, title, url);
+        ARLayer.poiList.add(poi);
+    }
 }
