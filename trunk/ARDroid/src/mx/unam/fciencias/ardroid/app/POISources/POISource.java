@@ -4,6 +4,8 @@ import android.location.Location;
 import mx.unam.fciencias.ardroid.app.ARLayer;
 import mx.unam.fciencias.ardroid.app.POI;
 
+import java.util.ArrayList;
+
 /**
  * Created by IntelliJ IDEA.
  * User: lander
@@ -13,13 +15,21 @@ import mx.unam.fciencias.ardroid.app.POI;
  */
 public abstract class POISource {
 
+    ArrayList<POI> poiList = new ArrayList<POI>();
+
     public abstract void retrievePOIs(double latitude, double longitude);
 
-    protected void createPOIAndAddToLis(double latitude, double longitude, String provider, String title, String url) {
+    protected void createPOIAndAddToList(double latitude, double longitude, String provider, String title, String url) {
         Location location = new Location(provider);
         location.setLatitude(latitude);
         location.setLongitude(longitude);
         POI poi = new POI(location, ARLayer.currentLocation, title, url);
-        ARLayer.poiList.add(poi);
+        poiList.add(poi);
+    }
+
+    protected void addPOIListToARLayer(){
+        if(poiList.size() > 0){
+            ARLayer.addPOIList(poiList);
+        }
     }
 }
