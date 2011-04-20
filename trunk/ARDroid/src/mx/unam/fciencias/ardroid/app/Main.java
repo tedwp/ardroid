@@ -85,6 +85,8 @@ public class Main extends Activity {
     private void initComponents() {
         cameraPreview = new CameraPreview();
         arLayer = new ARLayer();
+        //Para mantener la pantalla encendida
+        arLayer.setKeepScreenOn(true);
         try {
             arLayer.onStart();
         } catch (LocationProviderNullException e) {
