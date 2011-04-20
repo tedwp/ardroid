@@ -52,14 +52,25 @@ public class POI extends View {
 
     private String infoUrl;
 
-    private Paint paint1;
-    private Paint paint2;
+    private Paint circlePaint;
+    private Paint textPaint;
     private int poiHalfWidth;
     private int poiHalfHeight;
 
     private boolean isVisibleInRange = false;
+    private boolean isVisibleFromCollisions = true;
 
     private RadialGradient rg;
+
+    private final int NAME_MAX_LENGTH = 37;
+
+    private int leftTextBound;
+    private int rightTextBound;
+    private int textLengthHalf;
+
+    public int l, r, t, b;
+
+    public int collisionCounter = 0;
 
     /**
      * Instantiates a new pOI.
@@ -71,7 +82,11 @@ public class POI extends View {
      */
     public POI(Location poiLocation, Location deviceLocation, String name, String infoUrl) {
         super(Main.context);
-        this.name = name;
+        if (name.length() > NAME_MAX_LENGTH) {
+            this.name = name.substring(0, NAME_MAX_LENGTH) + "...";
+        } else {
+            this.name = name;
+        }
         this.poiLocation = poiLocation;
         this.source = poiLocation.getProvider();
         this.infoUrl = infoUrl;
@@ -90,16 +105,23 @@ public class POI extends View {
     }
 
     private void initPaint() {
-        paint1 = new Paint();
-        paint1.setColor(Color.RED);
-        paint1.setAntiAlias(true);
-        paint1.setStyle(Paint.Style.STROKE);
-        paint1.setStrokeWidth(6);
-        paint2 = new Paint();
-        paint2.setColor(Color.WHITE);
-        paint2.setAntiAlias(true);
-        paint2.setFakeBoldText(true);
-        paint2.setTextSize(24);
+        circlePaint = new Paint();
+        circlePaint.setColor(Color.RED);
+        circlePaint.setAntiAlias(true);
+        circlePaint.setStyle(Paint.Style.STROKE);
+        circlePaint.setStrokeWidth(6);
+        textPaint = new Paint();
+        textPaint.setColor(Color.WHITE);
+        textPaint.setAntiAlias(true);
+        textPaint.setFakeBoldText(true);
+        textPaint.setTextSize(18);
+        Rect rect = new Rect();
+        //Obtenemos la frontera del texto a la derecha e izquieda para poder posicionarlo
+        //centrado respecto al círculo.
+        textPaint.getTextBounds(name, 0, name.length(), rect);
+        leftTextBound = rect.left;
+        rightTextBound = rect.right;
+        textLengthHalf = Math.abs(rightTextBound - leftTextBound) / 2;
     }
 
     public void updateValues() {
@@ -132,8 +154,12 @@ public class POI extends View {
     public void draw(Canvas canvas) {
         int x = getLeft() + poiHalfWidth;
         int y = getTop() + poiHalfHeight;
-        canvas.drawCircle(x, y, 35, paint1);
-        canvas.drawText(name, x - 35, y + 55, paint2);
+        l = x - textLengthHalf;
+        r = x + textLengthHalf;
+        t = y - 18;
+        b = y + 55;
+        canvas.drawCircle(x, y, 35, circlePaint);
+        canvas.drawText(name, l, y + 55, textPaint);
         super.draw(canvas);
     }
 
@@ -165,6 +191,7 @@ public class POI extends View {
         if (POI.deviceLocation.hasAltitude() && poiLocation.hasAltitude()) {
             double altitudeDiff;
             boolean negative = false;
+            //TODO: Se puede simplificar con valor absoluto
             if (poiLocation.getAltitude() > POI.deviceLocation.getAltitude()) {
                 altitudeDiff = poiLocation.getAltitude()
                         - POI.deviceLocation.getAltitude();

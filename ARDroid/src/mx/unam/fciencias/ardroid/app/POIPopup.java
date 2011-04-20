@@ -1,5 +1,6 @@
 package mx.unam.fciencias.ardroid.app;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -125,8 +126,8 @@ public class POIPopup extends PopupWindow {
      */
     public void show(POI poi) {
         poiTitle.setText(poi.getName());
-        DecimalFormat twoDForm = new DecimalFormat("#,##");
-        poiDistance.setText(Main.context.getText(R.string.distance_text_popup) + " " + twoDForm.format(poi.getDistance()) + "m");
+        DecimalFormat twoDForm = new DecimalFormat("##,###");
+        poiDistance.setText(Main.context.getText(R.string.distance_text_popup) + " " + twoDForm.format((int) poi.getDistance()) + "m");
         /**
          * Antes de cargar la nueva página ponemos el WebView en blanco
          * para borrar la página cargada en otra llamada a este método
@@ -136,6 +137,7 @@ public class POIPopup extends PopupWindow {
          * En caso de que el POI no tenga un URL con información extra notificamos al usuario de esto.
          */
         if (poi.getInfoUrl() != null) {
+            Log.d("urlInfo", "Url: " + poi.getInfoUrl());
             progressBarLayout.setVisibility(ProgressBar.VISIBLE);
             progressBar.setProgress(0);
             webView.loadUrl(poi.getInfoUrl());

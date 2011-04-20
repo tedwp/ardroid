@@ -20,8 +20,7 @@ import android.view.WindowManager;
 import mx.unam.fciencias.ardroid.app.POISources.GeoNamesPOISource;
 import mx.unam.fciencias.ardroid.app.POISources.POISource;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 // TODO: Auto-generated Javadoc
@@ -66,6 +65,7 @@ public class ARLayer extends View {
      * Lista de POI
      */
     public static CopyOnWriteArrayList<POI> poiList;
+    private static Comparator poiListComparator;
 
     private static final float CAMERA_ANGLE_HORIZONTAL = 49.55f;
     private static final float CAMERA_ANGLE_VERTICAL = 34.2f;
@@ -91,6 +91,7 @@ public class ARLayer extends View {
      * Lo usamos para esperar a tener una buena precisión en la ubicación para empezar a bajar los datos de los POIs
      */
     private boolean poiDownloadStarted = false;
+    private static final int MAXIMUM_COLLISIONS = 3;
 
     /**
      * Constructor
@@ -100,8 +101,11 @@ public class ARLayer extends View {
         initLayout();
         initDrawComponents();
         //poiList = java.util.Collections.synchronizedList(new ArrayList<POI>());
+        //Utilizamos este tipo de dato para que pueda haber acceso concurrente a la lista
+        //Ya que mientras estamos recorriendola para mostrar los POI, se agregan más
+        //Desde el servicio
         poiList = new CopyOnWriteArrayList<POI>();
-        // TODO: Checar si necesita ser synchronized o no hace falta.
+        poiListComparator = new POIDistanceComparator();
         SensorAvgFilter.initAvgArrays();
         arView = this;
         accuracyDisplay = new AccuracyDisplay();
@@ -184,16 +188,30 @@ public class ARLayer extends View {
 
     }
 
+    /**
+     * Detenemos las actualizaciones del GPS
+     */
     private void stopGPS() {
         if (locationManager != null)
             locationManager.removeUpdates(locationListener);
     }
 
+    /**
+     * Detenemos las actualizaciones de los sensores
+     */
     private void stopSensors() {
         if (sensorManager != null)
             sensorManager.unregisterListener(orientationListener);
     }
 
+    /**
+     * Calculamos la dirección en la que apunta el teléfono de acuerdo al norte magnético
+     * Hacemos esto utilizando los valores del acelerómetro, el magnetómetro y usando una
+     * matriz de rotación, después reasignamos los ejes para que concuerden con la posición
+     * del dispositivo.
+     *
+     * @return Dirección de 0º a 359º
+     */
     private float computeDirection() {
         float[] valores = new float[3];
         float[] matrizDeRotacion = new float[9];
@@ -218,6 +236,13 @@ public class ARLayer extends View {
         return direction;
     }
 
+    /**
+     * Calculamos la inclinación del dispositivo usando los valores del acelerómetro.
+     *
+     * @param rollingX Valor del acelerómetro en el eje X
+     * @param rollingZ Valor del acelerómetro en el eje Z
+     * @return Inclinación del dispositivo de -90 a 90
+     */
     private float computeInclination(float rollingX, float rollingZ) {
         //Si uno de los ejes i.e. Z es cero, entonces es porque el dispositivo
         //está paralelo a ese eje, entonces la inclinación debería ser 0 o 180,
@@ -243,31 +268,30 @@ public class ARLayer extends View {
     }
 
     /**
-     * The orientation listener.
+     * Escucha para los sensores
      */
     final SensorEventListener orientationListener = new SensorEventListener() {
 
         public void onSensorChanged(SensorEvent event) {
+            //En caso de que el sensor sea el magnetómetro, guardamos sus valores, calculamos la
+            //dirección del dispositivo y pasamos ese valor al filtro óptimo
             if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
                 valuesMagneticField = event.values;
-
-
                 //direction = SensorOptimalFilter.filterDirection(computeDirection());
                 Log.d("cambio", "Dir1: " + direction);
                 direction = SensorAvgFilter.orientationListener(computeDirection());
                 Log.d("cambio", "Dir2: " + direction);
             }
-
+            //En caso de que el sensor sea el acelerómetro, guardamos sus valores, calculamos la
+            //inclinación del dispositivo y pasamos ese valor al filtro ópitmo
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 valuesAccelerometer = event.values;
-
                 inclination = SensorOptimalFilter.filterInclination(computeInclination(event.values[0], event.values[2]));
-
             }
-
-
+            //Si cambio la dirección o la inclinación entonces debemos actualizar los POI
             if (SensorOptimalFilter.directionChanged
                     || SensorOptimalFilter.inclinationChanged || SensorAvgFilter.directionChanged || SensorAvgFilter.inclinationChanged) {
+                //Si cambio nuestra ubicación, la pasamos a updatePOILayout
                 if (locationChanged) {
                     Log.d("gps", "Location changed, updating");
                     updatePOILayout(currentLocation);
@@ -275,7 +299,9 @@ public class ARLayer extends View {
                 } else {
                     updatePOILayout(null);
                 }
+                //Ponemos la dirección en la que está el dispositivo en el radar
                 Radar.setDirection(direction);
+                //Con esta llamada se redibujan todos los elementos de la pantalla
                 postInvalidate();
             }
 
@@ -297,7 +323,7 @@ public class ARLayer extends View {
                     + ", " + location.getLongitude() + ", altitude: " + location.getAltitude());
             locationChanged = true;
             float accuracy = location.getAccuracy();
-            if(accuracy<50 && !poiDownloadStarted){
+            if (accuracy < 50 && !poiDownloadStarted) {
                 poiDownloadStarted = true;
                 new DownloadPOIData().execute(null, null, null);
             }
@@ -316,6 +342,11 @@ public class ARLayer extends View {
         }
     };
 
+    /**
+     * Calculamos el brazo izquierdo de vista de la cámara
+     *
+     * @return Ángulo el brazo izquierdo
+     */
     private float leftArm() {
         float la = direction - CAMERA_ANGLE_HORIZONTAL_HALF;
         if (la < 0) {
@@ -324,6 +355,11 @@ public class ARLayer extends View {
         return la;
     }
 
+    /**
+     * Calculamos el brazo derecho de vista de la cámara
+     *
+     * @return
+     */
     private float rightArm() {
         float ra = direction + CAMERA_ANGLE_HORIZONTAL_HALF;
         if (ra > 360) {
@@ -334,6 +370,10 @@ public class ARLayer extends View {
 
     /**
      * Calcula la posición en x de un POI
+     * Calculamos un x en grados relativo a la dirección del dispositivo
+     * usando el brazo izquierdo y derecho, después multiplicamos ese x por el ancho
+     * de la pantalla para obtener su posición en pixeles. Y dividimos ese valor entre
+     * el ángulo horizontal de visión de la cámara.
      *
      * @param dir Dirección del POI
      * @return Posición en x del POI
@@ -354,6 +394,11 @@ public class ARLayer extends View {
         return (x * screenWidth) / CAMERA_ANGLE_HORIZONTAL;
     }
 
+    /**
+     * Calculamos el brazo superior del ángulo de vista de la cámara
+     *
+     * @return
+     */
     private float upperArm() {
         return inclination + CAMERA_ANGLE_VERTICAL_HALF;
     }
@@ -405,15 +450,13 @@ public class ARLayer extends View {
      *
      * @param location Ubicación del dispositivo
      */
-    private void updatePOILayout(
-            Location location) {
+    private void updatePOILayout(Location location) {
         if (location != null) {
             updatePOILocation(location);
         }
         for (POI poi : poiList) {
             // Calculamos la posición en x y en y de este POI y redondeamos al
-            // entero
-            // más cercano
+            // entero más cercano
             int x = Math.round(xPosition(poi.getAzimuth()));
             int y = Math.round(yPosition(poi.getInclination()));
 
@@ -446,7 +489,10 @@ public class ARLayer extends View {
         return ret;
     }
 
-    //Class to login in a background thread
+    /**
+     * Clase para descargar los POI de las fuentes de información
+     * en un thread separado
+     */
     class DownloadPOIData extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -461,6 +507,119 @@ public class ARLayer extends View {
         @Override
         protected void onPostExecute(Void s) {
             Log.d("poiData", "Se termino de bajar los POI");
+        }
+    }
+
+    /**
+     * Clase para comparar los POI en base a su distancia al dispositivo
+     * y así poder ordenarlos de esta manera
+     */
+    class POIDistanceComparator implements Comparator<POI> {
+        public int compare(POI p1, POI p2) {
+            float d1 = p1.getDistance();
+            float d2 = p2.getDistance();
+            return (int) (d1 - d2);
+        }
+    }
+
+    /**
+     * Método auxiliar para mantener ordenado <code>poiList</code> al agregarle un elemento.
+     * Como <code>poiList</code> es <code>CopyOnWriteArrayList</code> que es "thread safe"
+     * no podemos usar sort sobre ella, pues sort no es "thread safe", entonce,
+     * tenemos que copiar la lista en otra para poder entonces ordenarla,
+     * luego vaciamos la lista original y copiamos la nueva lista ordenada a ella.
+     *
+     * @param poi POI a agregar
+     */
+    public static void addPOI(POI poi) {
+        poiList.add(poi);
+        POI[] aList = poiList.toArray(new POI[0]);
+        Arrays.sort(aList, poiListComparator);
+        poiList.clear();
+        poiList.addAll(Arrays.asList(aList));
+    }
+
+    /**
+     * Método auxiliar para mantener ordenado <code>poiList</code> al agregarle una lista de elementos.
+     * Como <code>poiList</code> es <code>CopyOnWriteArrayList</code> que es "thread safe"
+     * no podemos usar sort sobre ella, pues sort no es "thread safe", entonce,
+     * tenemos que copiar la lista en otra para poder entonces ordenarla,
+     * luego vaciamos la lista original y copiamos la nueva lista ordenada a ella.
+     *
+     * @param poiL Lista de POI a agregar
+     */
+    public static void addPOIList(ArrayList<POI> poiL) {
+        poiList.addAll(poiL);
+        POI[] aList = poiList.toArray(new POI[0]);
+        Arrays.sort(aList, poiListComparator);
+        poiList.clear();
+        poiList.addAll(Arrays.asList(aList));
+        int i = 1;
+        for (POI p : poiList) {
+            Log.d("comparator", "POI: " + i + ", dist: " + p.getDistance());
+            ++i;
+        }
+    }
+
+    public static void checkForCollisions(POI poi, int n) {
+        for (int i = 0; i < n; ++i) {
+            POI p = poiList.get(i);
+            checkPOICollision(poi, p);
+        }
+    }
+
+    private static int checkPOICollision(POI p2, POI p1) {
+        int ret;
+        //Si se alcanza el número máximo de colisiones sobre un POI ya no se dibuja el que está colisionando
+        if (p1.collisionCounter >= MAXIMUM_COLLISIONS) {
+            return -1;
+        }
+
+        boolean hCollision = false;
+        boolean vCollision = false;
+
+        //Si alguno de los lados izquierdo o derecho de la frontera de ambos POI
+        //son iguales entonces colisionan horizontalmente
+        if (p1.l == p2.l || p1.r == p2.r || p1.l == p2.r || p1.r == p2.l) {
+            //Chocan horizontalmente
+            hCollision = true;
+        } else {
+            if (p2.l > p1.l) {
+                if (p2.l < p1.r) {
+                    //Chocan horizontalmente
+                    hCollision = true;
+                }
+            } else {
+                if (p1.l < p2.r) {
+                    //Chocan horizontalmente
+                    hCollision = true;
+                }
+            }
+        }
+
+        //Si alguno de los lados arriba o abajo de la frontera de ambos POI
+        //son iguales entonces colisionan verticalmente
+        if (p1.t == p2.t || p1.b == p2.b || p1.t == p2.b || p1.b == p2.t) {
+            //Chocan verticalmente
+            vCollision = true;
+        } else {
+            if (p2.t > p1.t) {
+                if (p2.t < p1.b) {
+                    //Chocan verticalmente
+                    vCollision = true;
+                }
+            } else {
+                if (p1.t < p2.b) {
+                    //Chocan verticalmente
+                    vCollision = true;
+                }
+            }
+        }
+
+        if (hCollision && vCollision) {
+            return 1;
+        } else {
+            return 0;
         }
     }
 }
