@@ -91,7 +91,7 @@ public class ARLayer extends View {
      * Lo usamos para esperar a tener una buena precisión en la ubicación para empezar a bajar los datos de los POIs
      */
     private boolean poiDownloadStarted = false;
-    private static final int MAXIMUM_COLLISIONS = 3;
+    private static final int MAXIMUM_COLLISIONS = 2;
 
     /**
      * Constructor
@@ -454,13 +454,23 @@ public class ARLayer extends View {
         if (location != null) {
             updatePOILocation(location);
         }
-        for (POI poi : poiList) {
-            // Calculamos la posición en x y en y de este POI y redondeamos al
-            // entero más cercano
-            int x = Math.round(xPosition(poi.getAzimuth()));
-            int y = Math.round(yPosition(poi.getInclination()));
 
-            poi.poiLayout(x, y, x, y);
+        for(POI poi : poiList){
+            poi.collisionCounter = 0;
+            poi.setIsVisibleFromCollisions(true);
+        }
+        int i = 0;
+        for (POI poi : poiList) {
+            //Si el POI no es visible no hace falta calcular nada pues no se dibujará
+            if (poi.isVisibleInRange()) {
+                // Calculamos la posición en x y en y de este POI y redondeamos al
+                // entero más cercano
+                int x = Math.round(xPosition(poi.getAzimuth()));
+                int y = Math.round(yPosition(poi.getInclination()));
+                poi.poiLayout(x, y, x, y);
+                checkForCollisions(poi, i);
+                ++i;
+            }
         }
     }
 
@@ -473,7 +483,7 @@ public class ARLayer extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         for (POI poi : poiList) {
-            if (poi.isVisibleInRange()) {
+            if (poi.isVisibleInRange() && poi.isVisibleFromCollisions()) {
                 poi.draw(canvas);
             }
         }
@@ -564,10 +574,34 @@ public class ARLayer extends View {
     public static void checkForCollisions(POI poi, int n) {
         for (int i = 0; i < n; ++i) {
             POI p = poiList.get(i);
-            checkPOICollision(poi, p);
+            int collision = checkPOICollision(poi, p);
+            switch (collision) {
+                case -1:
+                    //No debe dibujarse y ya no hace falta checar nada más
+                    poi.setIsVisibleFromCollisions(false);
+                    return;
+                case 0:
+                    //No colisiona, no hay que hacer nada
+                    poi.setIsVisibleFromCollisions(true);
+                    break;
+
+                case 1:
+                    //Colisiona, hay que moverlo y seguir checando
+                    poi.movePOIUp();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
+    /**
+     * Checa si el POI p2 colisiona con el POI p1
+     *
+     * @param p2
+     * @param p1
+     * @return
+     */
     private static int checkPOICollision(POI p2, POI p1) {
         int ret;
         //Si se alcanza el número máximo de colisiones sobre un POI ya no se dibuja el que está colisionando
@@ -617,6 +651,7 @@ public class ARLayer extends View {
         }
 
         if (hCollision && vCollision) {
+            p1.collisionCounter++;
             return 1;
         } else {
             return 0;

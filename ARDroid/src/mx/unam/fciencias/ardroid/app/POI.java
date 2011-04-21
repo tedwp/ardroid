@@ -62,15 +62,18 @@ public class POI extends View {
 
     private RadialGradient rg;
 
-    private final int NAME_MAX_LENGTH = 37;
+    private final int NAME_MAX_LENGTH = 23;
 
     private int leftTextBound;
     private int rightTextBound;
     private int textLengthHalf;
 
     public int l, r, t, b;
+    private int x, y;
 
     public int collisionCounter = 0;
+
+    private final int PIXELS_TO_MOVE_UP_IN_COLLISION = 90;
 
     /**
      * Instantiates a new pOI.
@@ -83,7 +86,7 @@ public class POI extends View {
     public POI(Location poiLocation, Location deviceLocation, String name, String infoUrl) {
         super(Main.context);
         if (name.length() > NAME_MAX_LENGTH) {
-            this.name = name.substring(0, NAME_MAX_LENGTH) + "...";
+            this.name = name.substring(0, NAME_MAX_LENGTH) + "..";
         } else {
             this.name = name;
         }
@@ -154,10 +157,6 @@ public class POI extends View {
     public void draw(Canvas canvas) {
         int x = getLeft() + poiHalfWidth;
         int y = getTop() + poiHalfHeight;
-        l = x - textLengthHalf;
-        r = x + textLengthHalf;
-        t = y - 18;
-        b = y + 55;
         canvas.drawCircle(x, y, 35, circlePaint);
         canvas.drawText(name, l, y + 55, textPaint);
         super.draw(canvas);
@@ -243,7 +242,21 @@ public class POI extends View {
     }
 
     public void poiLayout(int left, int top, int right, int bottom) {
+        l = left - textLengthHalf;
+        r = left + textLengthHalf;
+        t = top - 18;
+        b = top + 55;
+        x = left;
+        y = top;
         this.layout(left - poiHalfWidth, top - poiHalfHeight, right + poiHalfWidth, +bottom + poiHalfHeight);
+    }
+
+    public void movePOIUp() {
+        l = x - textLengthHalf;
+        r = x + textLengthHalf;
+        t = y - 18 - PIXELS_TO_MOVE_UP_IN_COLLISION;
+        b = y + 55 - PIXELS_TO_MOVE_UP_IN_COLLISION;
+        this.layout(x - poiHalfHeight, y - poiHalfHeight - PIXELS_TO_MOVE_UP_IN_COLLISION, x + poiHalfWidth, y + poiHalfHeight - PIXELS_TO_MOVE_UP_IN_COLLISION);
     }
 
     public float getDistance() {
@@ -256,5 +269,13 @@ public class POI extends View {
 
     public boolean isVisibleInRange() {
         return isVisibleInRange;
+    }
+
+    public boolean isVisibleFromCollisions() {
+        return isVisibleFromCollisions;
+    }
+
+    public void setIsVisibleFromCollisions(boolean b) {
+        isVisibleFromCollisions = b;
     }
 }
