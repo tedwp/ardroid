@@ -43,7 +43,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK" level="application" />
     <orderEntry type="library" name="Android 2.0 Platform" level="application" />
-    <orderEntry type="library" name="Android 2.1-update1 Platform" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="Android 2.1-update1 Platform" level="application" />
   </component>
 </module>
 

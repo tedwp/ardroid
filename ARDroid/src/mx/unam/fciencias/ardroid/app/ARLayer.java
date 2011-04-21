@@ -91,7 +91,7 @@ public class ARLayer extends View {
      * Lo usamos para esperar a tener una buena precisión en la ubicación para empezar a bajar los datos de los POIs
      */
     private boolean poiDownloadStarted = false;
-    private static final int MAXIMUM_COLLISIONS = 2;
+    private static final int MAXIMUM_COLLISIONS = 1;
 
     /**
      * Constructor
@@ -312,6 +312,8 @@ public class ARLayer extends View {
         }
     };
 
+    private static final int GPS_ACCURACY_TO_DOWNLOAD_DATA = 100;
+    //TODO: Cambiar a 50
     /**
      * Escucha para el cambio de ubicación.
      */
@@ -323,7 +325,7 @@ public class ARLayer extends View {
                     + ", " + location.getLongitude() + ", altitude: " + location.getAltitude());
             locationChanged = true;
             float accuracy = location.getAccuracy();
-            if (accuracy < 50 && !poiDownloadStarted) {
+            if (accuracy < GPS_ACCURACY_TO_DOWNLOAD_DATA && !poiDownloadStarted) {
                 poiDownloadStarted = true;
                 new DownloadPOIData().execute(null, null, null);
             }
@@ -455,7 +457,7 @@ public class ARLayer extends View {
             updatePOILocation(location);
         }
 
-        for(POI poi : poiList){
+        for (POI poi : poiList) {
             poi.collisionCounter = 0;
             poi.setIsVisibleFromCollisions(true);
         }
@@ -603,12 +605,6 @@ public class ARLayer extends View {
      * @return
      */
     private static int checkPOICollision(POI p2, POI p1) {
-        int ret;
-        //Si se alcanza el número máximo de colisiones sobre un POI ya no se dibuja el que está colisionando
-        if (p1.collisionCounter >= MAXIMUM_COLLISIONS) {
-            return -1;
-        }
-
         boolean hCollision = false;
         boolean vCollision = false;
 
@@ -651,8 +647,14 @@ public class ARLayer extends View {
         }
 
         if (hCollision && vCollision) {
-            p1.collisionCounter++;
-            return 1;
+
+            //Si se alcanza el número máximo de colisiones sobre un POI ya no se dibuja el que está colisionando
+            if (p1.collisionCounter >= MAXIMUM_COLLISIONS) {
+                return -1;
+            } else {
+                p1.collisionCounter++;
+                return 1;
+            }
         } else {
             return 0;
         }
