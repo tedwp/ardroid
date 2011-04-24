@@ -20,8 +20,7 @@ public class GeoNamesPOISource extends POISource {
 
     @Override
     public void retrievePOIs(double latitude, double longitude) {
-        String getAddress = GET_ADDRESS.replace("{lat}", new Double(latitude).toString());
-        getAddress = getAddress.replace("{lng}", new Double(longitude).toString());
+        String getAddress = replaceLatLongInAddress(GET_ADDRESS, latitude, longitude);
         Log.d("poiData", "Get: " + getAddress);
         try {
             String response = HttpConnection.sendGet(getAddress);

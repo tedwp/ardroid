@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -61,6 +62,7 @@ public class Main extends Activity {
         initLayers();
         checkInternetConnection();
         TestPOIDrawing.testDrawPOI();
+        getScreenSize();
     }
 
     private void checkInternetConnection() {
@@ -116,7 +118,6 @@ public class Main extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
     }
 
     @Override
@@ -188,5 +189,12 @@ public class Main extends Activity {
         cameraPreview.onStop();
         arLayer.onStop();
         super.onStop();
+    }
+
+    private void getScreenSize() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        ARLayer.xdpi = metrics.xdpi;
+        ARLayer.ydpi = metrics.ydpi;
     }
 }

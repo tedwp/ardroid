@@ -20,7 +20,9 @@ import android.view.WindowManager;
 import mx.unam.fciencias.ardroid.app.POISources.GeoNamesPOISource;
 import mx.unam.fciencias.ardroid.app.POISources.POISource;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 // TODO: Auto-generated Javadoc
@@ -73,6 +75,10 @@ public class ARLayer extends View {
     private static final float CAMERA_ANGLE_HORIZONTAL_HALF = CAMERA_ANGLE_HORIZONTAL / 2;
     private static final float CAMERA_ANGLE_VERTICAL_HALF = CAMERA_ANGLE_VERTICAL / 2;
 
+    private static final float POI_RADIUS_IN_INCHES = 3f/8f;
+
+    public static int poiRadius;
+
     /**
      * Utilizamos esta vista para poder desplegar el POIPopup
      */
@@ -92,6 +98,8 @@ public class ARLayer extends View {
      */
     private boolean poiDownloadStarted = false;
     private static final int MAXIMUM_COLLISIONS = 1;
+    public static float xdpi;
+    public static float ydpi;
 
     /**
      * Constructor
@@ -106,7 +114,7 @@ public class ARLayer extends View {
         //Desde el servicio
         poiList = new CopyOnWriteArrayList<POI>();
         poiListComparator = new POIDistanceComparator();
-        SensorAvgFilter.initAvgArrays();
+        //SensorAvgFilter.initAvgArrays();
         arView = this;
         accuracyDisplay = new AccuracyDisplay();
     }
@@ -127,6 +135,13 @@ public class ARLayer extends View {
         screenHeight = display.getHeight();
         screenWidth = display.getWidth();
         poiPopup = new POIPopup(screenWidth, screenHeight);
+        float xLength = screenWidth/xdpi;
+        float yLength = screenHeight/ydpi;
+        float xPOI = xLength/ POI_RADIUS_IN_INCHES;
+        float yPOI = yLength/ POI_RADIUS_IN_INCHES;
+        float xRadius = screenWidth/xPOI;
+        float yRadius = screenHeight/yPOI;
+        poiRadius = (int) Math.max(xRadius, yRadius);
     }
 
     /**
@@ -513,6 +528,8 @@ public class ARLayer extends View {
             double longitude = currentLocation.getLongitude();
             POISource geo = new GeoNamesPOISource();
             geo.retrievePOIs(latitude, longitude);
+            //POISource twitter = new TwitterPOISource();
+            //twitter.retrievePOIs(latitude, longitude);
             return null;
         }
 

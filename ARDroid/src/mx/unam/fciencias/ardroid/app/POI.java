@@ -119,7 +119,7 @@ public class POI extends View {
         textPaint.setFakeBoldText(true);
         textPaint.setTextSize(18);
         Rect rect = new Rect();
-        //Obtenemos la frontera del texto a la derecha e izquieda para poder posicionarlo
+        //Obtenemos la frontera del texto a la derecha e izquierda para poder posicionarlo
         //centrado respecto al círculo.
         textPaint.getTextBounds(name, 0, name.length(), rect);
         leftTextBound = rect.left;
