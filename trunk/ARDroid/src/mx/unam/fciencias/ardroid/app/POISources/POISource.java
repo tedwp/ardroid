@@ -17,6 +17,7 @@ public abstract class POISource {
 
     ArrayList<POI> poiList = new ArrayList<POI>();
 
+
     public abstract void retrievePOIs(double latitude, double longitude);
 
     protected void createPOIAndAddToList(double latitude, double longitude, String provider, String title, String url) {
@@ -27,9 +28,14 @@ public abstract class POISource {
         poiList.add(poi);
     }
 
-    protected void addPOIListToARLayer(){
-        if(poiList.size() > 0){
+    protected void addPOIListToARLayer() {
+        if (poiList.size() > 0) {
             ARLayer.addPOIList(poiList);
         }
+    }
+
+    protected String replaceLatLongInAddress(String address, double latitude, double longitude) {
+        String getAddress = address.replace("{lat}", new Double(latitude).toString());
+        return getAddress.replace("{lng}", new Double(longitude).toString());
     }
 }
