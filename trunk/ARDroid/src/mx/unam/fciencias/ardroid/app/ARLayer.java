@@ -35,22 +35,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ARLayer extends View {
 
     /**
-     * The direction.
+     * Dirección a la que apunta el dispositivo.
      */
     private float direction;
 
     /**
-     * The inclination.
+     * Inclinación del dispositivo respecto al suelo.
      */
     private float inclination;
 
     /**
-     * The current location.
+     * La ubicación actual del dispositivo.
      */
     public static Location currentLocation;
 
     /**
-     * The location changed.
+     * Indica cuando la ubicación ha cambiado.
      */
     private boolean locationChanged = false;
 
@@ -108,9 +108,8 @@ public class ARLayer extends View {
         super(Main.context);
         initLayout();
         initDrawComponents();
-        //poiList = java.util.Collections.synchronizedList(new ArrayList<POI>());
         //Utilizamos este tipo de dato para que pueda haber acceso concurrente a la lista
-        //Ya que mientras estamos recorriendola para mostrar los POI, se agregan más
+        //Ya que mientras estamos recorriéndola para mostrar los POI, se agregan más
         //Desde el servicio
         poiList = new CopyOnWriteArrayList<POI>();
         poiListComparator = new POIDistanceComparator();
@@ -294,7 +293,7 @@ public class ARLayer extends View {
                 valuesMagneticField = event.values;
                 //direction = SensorOptimalFilter.filterDirection(computeDirection());
                 Log.d("cambio", "Dir1: " + direction);
-                direction = SensorAvgFilter.orientationListener(computeDirection());
+                direction = SensorOptimalFilter.filterDirection(computeDirection());
                 Log.d("cambio", "Dir2: " + direction);
             }
             //En caso de que el sensor sea el acelerómetro, guardamos sus valores, calculamos la
