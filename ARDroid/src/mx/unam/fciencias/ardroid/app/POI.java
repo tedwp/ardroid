@@ -157,7 +157,7 @@ public class POI extends View {
     public void draw(Canvas canvas) {
         int x = getLeft() + poiHalfWidth;
         int y = getTop() + poiHalfHeight;
-        canvas.drawCircle(x, y, 35, circlePaint);
+        canvas.drawCircle(x, y, ARLayer.poiRadius, circlePaint);
         canvas.drawText(name, l, y + 55, textPaint);
         super.draw(canvas);
     }
