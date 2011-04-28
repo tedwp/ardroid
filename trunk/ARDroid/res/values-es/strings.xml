@@ -9,13 +9,13 @@
     <string name="distance_text_popup">Distancia</string>
     <string name="app_name">ARDroid</string>
     <string name="exit">Salir</string>
-    <string name="pref_sources">Fuentes de PI</string>
+    <string name="pref_sources">Fuentes de PIs</string>
     <string name="yes">Si</string>
     <string name="movil_data_disabled_dialog_title">Internet deshabilitado</string>
     <string name="movil_data_disabled_dialog_text">ARDroid necesita una conexión a internet activa para trabajar.\n¿Desea habilitarlo ahora?</string>
-    <string name="pref_geonames_summary">Muestra PI de Wikipedia</string>
-    <string name="accuracy">Presición:</string>
-    <string name="pref_twitter_summary">Muestra twits cercanos</string>
+    <string name="pref_geonames_summary">Muestra PIs de Wikipedia</string>
+    <string name="accuracy">Precisión:</string>
+    <string name="pref_twitter_summary">Muestra mensajes de twitter cercanos</string>
     <string name="gps_disabled_dialog_title">GPS deshabilitado</string>
     <string name="pref_geonames">Geonames</string>
 </resources>
