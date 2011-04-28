@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
     <string name="hello">Hello World, Main!</string>
     <string name="app_name">ARDroid</string>
-    <string name="gps_disabled_dialog_title">GPS</string>
+    <string name="gps_disabled_dialog_title">GPS disabled</string>
     <string name="gps_disabled_dialog_text">ARDroid needs the GPS to be enabled in order to work.\nWould you like to enable it now?</string>
     <string name="movil_data_disabled_dialog_title">Internet Disabled</string>
     <string name="movil_data_disabled_dialog_text">ARDroid needs an active internet connection in order to work.\nWould you like to enable it now?</string>
@@ -12,4 +12,11 @@
     <string name="no_extra_data_popup">Sorry, there is no extra information for this Point Of Interest</string>
     <string name="loading_popup_webview">Loading more info...</string>
     <string name="accuracy">Accuracy:</string>
+    <string name="pref_sources">PI sources</string>
+    <string name="pref_sources_summary">Activates or deactivates the different PI sources</string>
+    <string name="pref_geonames">Geonames</string>
+    <string name="pref_twitter">Twitter</string>
+    <string name="pref_geonames_summary">Shows PI extracted from Wikipedia</string>
+    <string name="pref_twitter_summary">Shows nerby twits</string>
+    <string name="settings">Preferences</string>
 </resources>

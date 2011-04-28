@@ -6,24 +6,20 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
+import android.view.*;
 import android.widget.FrameLayout;
-import mx.unam.fciencias.ardroid.app.POISources.GeoNamesPOISource;
-import mx.unam.fciencias.ardroid.app.POISources.POISource;
 
 /**
  * Actividad principal de la aplicación.
  *
  * @author Sebastián García Anderman
  */
-public class Main extends Activity {
+public class Main extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     /**
      * De esta manera siempre tenemos acceso al contexto de la aplicación, lo
@@ -49,6 +45,11 @@ public class Main extends Activity {
     private static final int DIALOG_MOVIL_DATA_DISABLED = 1;
 
     /**
+     * Para acceder a las preferencias de la aplicación
+     */
+    private SharedPreferences preferences;
+
+    /**
      * Se llama cuando la actividad se crea por primera vez.
      *
      * @param savedInstanceState the saved instance state
@@ -63,6 +64,9 @@ public class Main extends Activity {
         checkInternetConnection();
         TestPOIDrawing.testDrawPOI();
         getScreenSize();
+        preferences =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     private void checkInternetConnection() {
@@ -196,5 +200,29 @@ public class Main extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         ARLayer.xdpi = metrics.xdpi;
         ARLayer.ydpi = metrics.ydpi;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.mainmenu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                Intent i = new Intent(this, Preferences.class);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        // TODO Check the shared preference and key parameters and change UI or // behavior as appropriate.
     }
 }
