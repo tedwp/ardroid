@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_sources"
+            android:summary="@string/pref_sources_summary">
+        <CheckBoxPreference
+                android:key="PREF_PI_SOURCE_GEONAMES"
+                android:title="@string/pref_geonames"
+                android:summary="@string/pref_geonames_summary"
+                android:defaultValue="true"/>
+        <CheckBoxPreference
+                android:key="PREF_PI_SOURCE_TWITTER"
+                android:title="@string/pref_twitter"
+                android:summary="@string/pref_twitter_summary"
+                android:defaultValue="false"/>
+    </PreferenceCategory>
+</PreferenceScreen>

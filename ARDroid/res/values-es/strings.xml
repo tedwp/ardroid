@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <string name="no_extra_data_popup">Lo sentimos, no hay información extra para este Punto de Interés</string>
+    <string name="gps_disabled_dialog_text">ARDroid que el GPS esté habilitado para trabajar.\n¿Quiere habilitarlo ahora?</string>
+    <string name="settings">Preferencias</string>
+    <string name="pref_sources_summary">Activa o desactiva diferentes fuentes para los PI</string>
+    <string name="loading_popup_webview">Cargando más información</string>
+    <string name="pref_twitter">Twitter</string>
+    <string name="distance_text_popup">Distancia</string>
+    <string name="app_name">ARDroid</string>
+    <string name="exit">Salir</string>
+    <string name="pref_sources">Fuentes de PI</string>
+    <string name="yes">Si</string>
+    <string name="movil_data_disabled_dialog_title">Internet deshabilitado</string>
+    <string name="movil_data_disabled_dialog_text">ARDroid necesita una conexión a internet activa para trabajar.\n¿Desea habilitarlo ahora?</string>
+    <string name="pref_geonames_summary">Muestra PI de Wikipedia</string>
+    <string name="accuracy">Presición:</string>
+    <string name="pref_twitter_summary">Muestra twits cercanos</string>
+    <string name="gps_disabled_dialog_title">GPS deshabilitado</string>
+    <string name="pref_geonames">Geonames</string>
+</resources>

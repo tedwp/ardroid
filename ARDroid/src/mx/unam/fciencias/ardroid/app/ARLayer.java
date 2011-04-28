@@ -1,6 +1,7 @@
 package mx.unam.fciencias.ardroid.app;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -12,6 +13,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.WindowManager;
 import mx.unam.fciencias.ardroid.app.POISources.GeoNamesPOISource;
 import mx.unam.fciencias.ardroid.app.POISources.POISource;
+import mx.unam.fciencias.ardroid.app.POISources.TwitterPOISource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +78,7 @@ public class ARLayer extends View {
     private static final float CAMERA_ANGLE_HORIZONTAL_HALF = CAMERA_ANGLE_HORIZONTAL / 2;
     private static final float CAMERA_ANGLE_VERTICAL_HALF = CAMERA_ANGLE_VERTICAL / 2;
 
-    private static final float POI_RADIUS_IN_INCHES = 3f/8f;
+    private static final float POI_RADIUS_IN_INCHES = 3f / 16f;
 
     public static int poiRadius;
 
@@ -134,13 +137,14 @@ public class ARLayer extends View {
         screenHeight = display.getHeight();
         screenWidth = display.getWidth();
         poiPopup = new POIPopup(screenWidth, screenHeight);
-        float xLength = screenWidth/xdpi;
-        float yLength = screenHeight/ydpi;
-        float xPOI = xLength/ POI_RADIUS_IN_INCHES;
-        float yPOI = yLength/ POI_RADIUS_IN_INCHES;
-        float xRadius = screenWidth/xPOI;
-        float yRadius = screenHeight/yPOI;
+        float xLength = screenWidth / xdpi;
+        float yLength = screenHeight / ydpi;
+        float xPOI = xLength / POI_RADIUS_IN_INCHES;
+        float yPOI = yLength / POI_RADIUS_IN_INCHES;
+        float xRadius = screenWidth / xPOI;
+        float yRadius = screenHeight / yPOI;
         poiRadius = (int) Math.max(xRadius, yRadius);
+        Log.d("radius", "Radio: " + poiRadius);
     }
 
     /**
@@ -525,10 +529,16 @@ public class ARLayer extends View {
         protected Void doInBackground(Void... voids) {
             double latitude = currentLocation.getLatitude();
             double longitude = currentLocation.getLongitude();
-            POISource geo = new GeoNamesPOISource();
-            geo.retrievePOIs(latitude, longitude);
-            //POISource twitter = new TwitterPOISource();
-            //twitter.retrievePOIs(latitude, longitude);
+            SharedPreferences preferences =
+                    PreferenceManager.getDefaultSharedPreferences(Main.context);
+            if (preferences.getBoolean("PREF_PI_SOURCE_GEONAMES", true)) {
+                POISource geo = new GeoNamesPOISource();
+                geo.retrievePOIs(latitude, longitude);
+            }
+            if (preferences.getBoolean("PREF_PI_SOURCE_TWITTER", false)) {
+                POISource twitter = new TwitterPOISource();
+                twitter.retrievePOIs(latitude, longitude);
+            }
             return null;
         }
 
