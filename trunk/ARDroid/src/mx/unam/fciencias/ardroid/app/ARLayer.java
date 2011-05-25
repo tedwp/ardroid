@@ -510,6 +510,15 @@ public class ARLayer extends View {
         super.onDraw(canvas);
     }
 
+    /**
+     * En caso de recibir un evento en el cual se haya tocado la pantalla en caso de no
+     * pertenecerle a esta vista, la pasamos a cada uno de los PI, si el usuario ha tocado la
+     * pantalla dentro del área que le corresponde a alguno de ellos, éste reaccionará
+     * mostrando la ventana de información correspondiente
+     *
+     * @param event Evento de toque de pantalla
+     * @return Si algún PI reaccionó al evento
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean ret = false;
@@ -531,10 +540,10 @@ public class ARLayer extends View {
             double longitude = currentLocation.getLongitude();
             SharedPreferences preferences =
                     PreferenceManager.getDefaultSharedPreferences(Main.context);
-            if (preferences.getBoolean("PREF_PI_SOURCE_GEONAMES", true)) {
-                POISource geo = new GeoNamesPOISource();
-                geo.retrievePOIs(latitude, longitude);
-            }
+            //if (preferences.getBoolean("PREF_PI_SOURCE_GEONAMES", true)) {
+            POISource geo = new GeoNamesPOISource();
+            geo.retrievePOIs(latitude, longitude);
+            //}
             if (preferences.getBoolean("PREF_PI_SOURCE_TWITTER", false)) {
                 POISource twitter = new TwitterPOISource();
                 twitter.retrievePOIs(latitude, longitude);
@@ -571,7 +580,7 @@ public class ARLayer extends View {
      */
     public static void addPOI(POI poi) {
         poiList.add(poi);
-        POI[] aList = poiList.toArray(new POI[0]);
+        POI[] aList = poiList.toArray(new POI[poiList.size()]);
         Arrays.sort(aList, poiListComparator);
         poiList.clear();
         poiList.addAll(Arrays.asList(aList));
@@ -588,7 +597,7 @@ public class ARLayer extends View {
      */
     public static void addPOIList(ArrayList<POI> poiL) {
         poiList.addAll(poiL);
-        POI[] aList = poiList.toArray(new POI[0]);
+        POI[] aList = poiList.toArray(new POI[poiList.size()]);
         Arrays.sort(aList, poiListComparator);
         poiList.clear();
         poiList.addAll(Arrays.asList(aList));
@@ -599,6 +608,14 @@ public class ARLayer extends View {
         }
     }
 
+    /**
+     * Checa si el PI colisiona con los n PI más cercanos al usuario que él mismo
+     * En caso de que colisione, establece si debe ser visible o no
+     *
+     * @param poi PI a checar por colisiones
+     * @param n   Número de PI a checar en la lista de PIs, basta con n pues la lista
+     *            está ordenada
+     */
     public static void checkForCollisions(POI poi, int n) {
         for (int i = 0; i < n; ++i) {
             POI p = poiList.get(i);
@@ -626,9 +643,9 @@ public class ARLayer extends View {
     /**
      * Checa si el POI p2 colisiona con el POI p1
      *
-     * @param p2
-     * @param p1
-     * @return
+     * @param p2 Primer PI
+     * @param p1 Segundo PI
+     * @return Si colisionan o no, y de que modo lo hacen
      */
     private static int checkPOICollision(POI p2, POI p1) {
         boolean hCollision = false;
