@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-// TODO: Auto-generated Javadoc
-
 /**
  * Clase que representa un punto de interés (POI Point of Interest).
  *
@@ -62,7 +60,7 @@ public class POI extends View {
 
     private RadialGradient rg;
 
-    private final int NAME_MAX_LENGTH = 23;
+    private static final int NAME_MAX_LENGTH = 23;
 
     private int leftTextBound;
     private int rightTextBound;
@@ -73,7 +71,7 @@ public class POI extends View {
 
     public int collisionCounter = 0;
 
-    private final int PIXELS_TO_MOVE_UP_IN_COLLISION = 90;
+    private static final int PIXELS_TO_MOVE_UP_IN_COLLISION = 90;
 
     /**
      * Instantiates a new pOI.
@@ -141,11 +139,7 @@ public class POI extends View {
     }
 
     public void updateVisibilityInRange() {
-        if (distance <= ARLayer.range) {
-            isVisibleInRange = true;
-        } else {
-            isVisibleInRange = false;
-        }
+        isVisibleInRange = distance <= ARLayer.range;
     }
 
     /**
@@ -208,8 +202,8 @@ public class POI extends View {
             }
             Log.d("gps2", "inc " + name + ": " + inclination);
         } else {
-            // TODO: Checar si con esto la hago
-            inclination = 0;
+            // TODO: Checar si no es mucho
+            inclination = 1;
         }
     }
 

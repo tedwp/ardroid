@@ -28,8 +28,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-// TODO: Auto-generated Javadoc
-
 /**
  * Clase que define la capa de realidad aumentada.
  *
