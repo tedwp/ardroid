@@ -9,8 +9,6 @@ import android.view.SurfaceView;
 import java.io.IOException;
 import java.util.List;
 
-// TODO: Auto-generated Javadoc
-
 /**
  * Clase que implementa la vista previa de la cámara del dispositivo.
  *
@@ -55,7 +53,6 @@ public class CameraPreview extends SurfaceView implements
         } catch (IOException exception) {
             camera.release();
             camera = null;
-            // TODO: add more exception handling logic here
         }
     }
 
@@ -133,7 +130,7 @@ public class CameraPreview extends SurfaceView implements
 
         // En el emulador truena con optimalSize, en el teléfono truena con
         // valores fijos
-        if (android.os.Build.DEVICE.indexOf("generic") != -1) {
+        if (android.os.Build.DEVICE.contains("generic")) {
             parameters.setPreviewSize(w, h);
         } else {
             List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
