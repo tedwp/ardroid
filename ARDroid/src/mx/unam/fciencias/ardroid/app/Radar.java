@@ -59,8 +59,6 @@ public class Radar extends View {
         xPosition = radius + 10;
         yPosition = radius + 10;
         direction = 0;
-        scale = (float) radius / ARLayer.range;
-
         directionTextXPos = xPosition;
         directionTextYPos = yPosition - radius + 10;
         radarLineLeftXEndPos = (float) ((Math.cos(Math.toRadians(225)) * radius) + xPosition);
@@ -116,7 +114,7 @@ public class Radar extends View {
      * Cambiamos el rango en el que estámos desplegando POIs, y recalculamos la escala
      */
     public static void setScale() {
-        scale = (float) radius / ARLayer.range;
+        scale = (float) radius / (ARLayer.range + ARLayer.DISTANCE_AROUND_RANGE);
     }
 
     @Override
