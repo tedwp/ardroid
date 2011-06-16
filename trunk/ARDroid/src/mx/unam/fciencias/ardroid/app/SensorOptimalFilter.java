@@ -41,7 +41,7 @@ public class SensorOptimalFilter {
     public static float filterDirection(float dir) {
         directionChanged = false;
         direction = optimalFilter(dir, prevDirection, NOISE_MAX_AMPLITUDE_DIRECTION);
-        Log.d("filtro", "Dir: " + direction);
+        //Log.d("filtro", "Dir: " + direction);
 
         //Si la dirección es menor que 180 sumamos 360 para que haya continuidad en el cambio de 359º a 0º
         if (direction <= 180) {

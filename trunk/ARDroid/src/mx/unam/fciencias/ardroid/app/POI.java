@@ -60,7 +60,8 @@ public class POI extends View {
 
     private RadialGradient rg;
 
-    private static final int NAME_MAX_LENGTH = 23;
+    private static final int NAME_MAX_LENGTH = 38;
+    private static final int NAME_MAX_LINE_LENGTH = 20;
 
     private int leftTextBound;
     private int rightTextBound;
@@ -71,7 +72,9 @@ public class POI extends View {
 
     public int collisionCounter = 0;
 
-    private static final int PIXELS_TO_MOVE_UP_IN_COLLISION = 90;
+    private static final int PIXELS_TO_MOVE_UP_IN_COLLISION = 100;
+
+    private static final int BOUND_TOLERANCE = 5;
 
     /**
      * Instantiates a new pOI.
@@ -83,8 +86,11 @@ public class POI extends View {
      */
     public POI(Location poiLocation, Location deviceLocation, String name, String infoUrl) {
         super(Main.context);
-        if (name.length() > NAME_MAX_LENGTH) {
-            this.name = name.substring(0, NAME_MAX_LENGTH) + "..";
+        if (name.length() > NAME_MAX_LINE_LENGTH) {
+            this.name = name.substring(0, NAME_MAX_LINE_LENGTH) + "\n" + name.substring(NAME_MAX_LINE_LENGTH, name.length());
+            if (this.name.length() > NAME_MAX_LENGTH) {
+                this.name = this.name.substring(0, NAME_MAX_LENGTH) + "..";
+            }
         } else {
             this.name = name;
         }
@@ -120,8 +126,8 @@ public class POI extends View {
         //Obtenemos la frontera del texto a la derecha e izquierda para poder posicionarlo
         //centrado respecto al círculo.
         textPaint.getTextBounds(name, 0, name.length(), rect);
-        leftTextBound = rect.left;
-        rightTextBound = rect.right;
+        leftTextBound = rect.left - BOUND_TOLERANCE;
+        rightTextBound = rect.right + BOUND_TOLERANCE;
         textLengthHalf = Math.abs(rightTextBound - leftTextBound) / 2;
     }
 
@@ -139,7 +145,8 @@ public class POI extends View {
     }
 
     public void updateVisibilityInRange() {
-        isVisibleInRange = distance <= ARLayer.range;
+        isVisibleInRange = (distance > (ARLayer.range - ARLayer.DISTANCE_AROUND_RANGE)) && (distance < (ARLayer.range + ARLayer.DISTANCE_AROUND_RANGE));
+//        isVisibleInRange = distance <= ARLayer.range;
     }
 
     /**

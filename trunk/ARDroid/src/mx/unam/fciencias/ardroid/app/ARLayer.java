@@ -103,6 +103,11 @@ public class ARLayer extends View {
     public static float ydpi;
 
     /**
+     * Este valor se usa para determinar la distancia alrededor del rango en la que mostraremos PI
+     */
+    public static final int DISTANCE_AROUND_RANGE = 5000;
+
+    /**
      * Constructor
      */
     public ARLayer() {
@@ -243,7 +248,7 @@ public class ARLayer extends View {
 
         //Convertimos de radianes a grados
         direction = (float) Math.toDegrees(valores[0]);
-        Log.d("filter2", "Dir: " + direction);
+        //Log.d("filter2", "Dir: " + direction);
         if (direction < 0) {
             direction = 360 + direction;
         } else if (direction >= 360) {
@@ -294,9 +299,9 @@ public class ARLayer extends View {
             if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
                 valuesMagneticField = event.values;
                 //direction = SensorOptimalFilter.filterDirection(computeDirection());
-                Log.d("cambio", "Dir1: " + direction);
+                //Log.d("cambio", "Dir1: " + direction);
                 direction = SensorOptimalFilter.filterDirection(computeDirection());
-                Log.d("cambio", "Dir2: " + direction);
+                //Log.d("cambio", "Dir2: " + direction);
             }
             //En caso de que el sensor sea el acelerómetro, guardamos sus valores, calculamos la
             //inclinación del dispositivo y pasamos ese valor al filtro ópitmo
@@ -539,6 +544,7 @@ public class ARLayer extends View {
             SharedPreferences preferences =
                     PreferenceManager.getDefaultSharedPreferences(Main.context);
             //if (preferences.getBoolean("PREF_PI_SOURCE_GEONAMES", true)) {
+            Log.d("poiData", "Comenzando a bajar los POI");
             POISource geo = new GeoNamesPOISource();
             geo.retrievePOIs(latitude, longitude);
             //}
@@ -601,7 +607,7 @@ public class ARLayer extends View {
         poiList.addAll(Arrays.asList(aList));
         int i = 1;
         for (POI p : poiList) {
-            Log.d("comparator", "POI: " + i + ", dist: " + p.getDistance());
+            //Log.d("comparator", "POI: " + i + ", dist: " + p.getDistance());
             ++i;
         }
     }
