@@ -105,7 +105,7 @@ public class ARLayer extends View {
     /**
      * Este valor se usa para determinar la distancia alrededor del rango en la que mostraremos PI
      */
-    public static final int DISTANCE_AROUND_RANGE = 2000;
+    public static final int DISTANCE_AROUND_RANGE = 1000;
 
     /**
      * Constructor
@@ -251,7 +251,7 @@ public class ARLayer extends View {
         //Log.d("filter2", "Dir: " + direction);
         if (direction < 0) {
             direction = 360 + direction;
-        } else if (direction >= 360) {
+        } else if (direction > 360) {
             direction = direction - 360;
         }
         return direction;
@@ -526,7 +526,8 @@ public class ARLayer extends View {
     public boolean onTouchEvent(MotionEvent event) {
         boolean ret = false;
         for (POI poi : poiList) {
-            ret = poi.dispatchTouchEvent(event);
+            if (poi.isVisibleInRange() && poi.isVisibleFromCollisions())
+                ret = poi.dispatchTouchEvent(event);
         }
         return ret;
     }
