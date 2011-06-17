@@ -105,7 +105,7 @@ public class ARLayer extends View {
     /**
      * Este valor se usa para determinar la distancia alrededor del rango en la que mostraremos PI
      */
-    public static final int DISTANCE_AROUND_RANGE = 5000;
+    public static final int DISTANCE_AROUND_RANGE = 2000;
 
     /**
      * Constructor
@@ -546,7 +546,8 @@ public class ARLayer extends View {
             //if (preferences.getBoolean("PREF_PI_SOURCE_GEONAMES", true)) {
             Log.d("poiData", "Comenzando a bajar los POI");
             POISource geo = new GeoNamesPOISource();
-            geo.retrievePOIs(latitude, longitude);
+            //TODO: QUitar este comentario
+            //geo.retrievePOIs(latitude, longitude);
             //}
             if (preferences.getBoolean("PREF_PI_SOURCE_TWITTER", false)) {
                 POISource twitter = new TwitterPOISource();
@@ -593,7 +594,7 @@ public class ARLayer extends View {
     /**
      * Método auxiliar para mantener ordenado <code>poiList</code> al agregarle una lista de elementos.
      * Como <code>poiList</code> es <code>CopyOnWriteArrayList</code> que es "thread safe"
-     * no podemos usar sort sobre ella, pues sort no es "thread safe", entonce,
+     * no podemos usar sort sobre ella, pues sort no es "thread safe", entonces,
      * tenemos que copiar la lista en otra para poder entonces ordenarla,
      * luego vaciamos la lista original y copiamos la nueva lista ordenada a ella.
      *
@@ -605,11 +606,6 @@ public class ARLayer extends View {
         Arrays.sort(aList, poiListComparator);
         poiList.clear();
         poiList.addAll(Arrays.asList(aList));
-        int i = 1;
-        for (POI p : poiList) {
-            //Log.d("comparator", "POI: " + i + ", dist: " + p.getDistance());
-            ++i;
-        }
     }
 
     /**
