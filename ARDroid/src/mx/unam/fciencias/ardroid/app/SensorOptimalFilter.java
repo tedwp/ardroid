@@ -19,9 +19,9 @@ public class SensorOptimalFilter {
     private static float inclination;
     private static float prevInclination;
 
-    private static final float LOW_PASS_FILTER_COEF = 0.15f;
-    private static final float NOISE_MAX_AMPLITUDE_DIRECTION = 8;
-    private static final float NOISE_MAX_AMPLITUDE_INCLINATION = 3;
+    private static final float LOW_PASS_FILTER_COEF = 0.05f;
+    private static final float NOISE_MAX_AMPLITUDE_DIRECTION = 40;
+    private static final float NOISE_MAX_AMPLITUDE_INCLINATION = 5;
 
     private static final float DIRECTION_THRESHOLD = 1f;
     private static final float INCLINATION_THRESHOLD = 0.5f;

@@ -16,7 +16,7 @@ import org.json.JSONObject;
  */
 public class GeoNamesPOISource extends POISource {
 
-    private final String GET_ADDRESS = "http://ws.geonames.org/findNearbyWikipediaJSON?lat={lat}&lng={lng}&lang=es&radius=20&maxRows=20";
+    private final String GET_ADDRESS = "http://ws.geonames.org/findNearbyWikipediaJSON?lat={lat}&lng={lng}&lang=es&radius=20&maxRows=50";
 
     @Override
     public void retrievePOIs(double latitude, double longitude) {
@@ -27,6 +27,7 @@ public class GeoNamesPOISource extends POISource {
             Log.d("poiData", "Response: " + response);
             if(response == null)
                 return;
+            Log.d("poiData", "Empezando a crear los objetos JSON");
             JSONObject responseJSON = new JSONObject(response);
             JSONArray poiJSONArray = responseJSON.getJSONArray("geonames");
             Log.d("poiData", "Se encontraron: " + poiJSONArray.length() + " POIs");

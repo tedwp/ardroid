@@ -43,6 +43,9 @@ public class POI extends View {
      */
     private String name;
 
+    private String nameDraw1;
+    private String nameDraw2;
+
     /**
      * The source.
      */
@@ -72,9 +75,9 @@ public class POI extends View {
 
     public int collisionCounter = 0;
 
-    private static final int PIXELS_TO_MOVE_UP_IN_COLLISION = 100;
+    private static final int PIXELS_TO_MOVE_UP_IN_COLLISION = 105;
 
-    private static final int BOUND_TOLERANCE = 5;
+    private static final int BOUND_TOLERANCE = 4;
 
     /**
      * Instantiates a new pOI.
@@ -86,12 +89,15 @@ public class POI extends View {
      */
     public POI(Location poiLocation, Location deviceLocation, String name, String infoUrl) {
         super(Main.context);
+        this.name = name;
         if (name.length() > NAME_MAX_LINE_LENGTH) {
-            this.name = name.substring(0, NAME_MAX_LINE_LENGTH) + "\n" + name.substring(NAME_MAX_LINE_LENGTH, name.length());
-            if (this.name.length() > NAME_MAX_LENGTH) {
-                this.name = this.name.substring(0, NAME_MAX_LENGTH) + "..";
+            this.nameDraw1 = name.substring(0, NAME_MAX_LINE_LENGTH);
+            this.nameDraw2 = name.substring(NAME_MAX_LINE_LENGTH, name.length());
+            if (this.nameDraw2.length() > NAME_MAX_LINE_LENGTH) {
+                this.nameDraw2 = this.nameDraw2.substring(0, NAME_MAX_LINE_LENGTH-2) + "..";
             }
         } else {
+            nameDraw1 = name;
             this.name = name;
         }
         this.poiLocation = poiLocation;
@@ -121,14 +127,14 @@ public class POI extends View {
         textPaint.setColor(Color.WHITE);
         textPaint.setAntiAlias(true);
         textPaint.setFakeBoldText(true);
-        textPaint.setTextSize(18);
+        textPaint.setTextSize(15);
         Rect rect = new Rect();
         //Obtenemos la frontera del texto a la derecha e izquierda para poder posicionarlo
         //centrado respecto al círculo.
-        textPaint.getTextBounds(name, 0, name.length(), rect);
+        textPaint.getTextBounds(nameDraw1, 0, nameDraw1.length(), rect);
         leftTextBound = rect.left - BOUND_TOLERANCE;
         rightTextBound = rect.right + BOUND_TOLERANCE;
-        textLengthHalf = Math.abs(rightTextBound - leftTextBound) / 2;
+        textLengthHalf = (Math.abs(rightTextBound - leftTextBound) / 2) + (BOUND_TOLERANCE*2);
     }
 
     public void updateValues() {
@@ -159,7 +165,10 @@ public class POI extends View {
         int x = getLeft() + poiHalfWidth;
         int y = getTop() + poiHalfHeight;
         canvas.drawCircle(x, y, ARLayer.poiRadius, circlePaint);
-        canvas.drawText(name, l, y + 55, textPaint);
+        canvas.drawText(nameDraw1, l, y + 55, textPaint);
+        if(nameDraw2 != null){
+            canvas.drawText(nameDraw2, l, y + 70, textPaint);
+        }
         super.draw(canvas);
     }
 
