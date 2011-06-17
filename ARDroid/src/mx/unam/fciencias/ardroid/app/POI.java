@@ -91,7 +91,7 @@ public class POI extends View {
         super(Main.context);
         this.name = name;
         if (name.length() > NAME_MAX_LINE_LENGTH) {
-            this.nameDraw1 = name.substring(0, NAME_MAX_LINE_LENGTH);
+            this.nameDraw1 = name.substring(0, NAME_MAX_LINE_LENGTH)+ "-";
             this.nameDraw2 = name.substring(NAME_MAX_LINE_LENGTH, name.length());
             if (this.nameDraw2.length() > NAME_MAX_LINE_LENGTH) {
                 this.nameDraw2 = this.nameDraw2.substring(0, NAME_MAX_LINE_LENGTH-2) + "..";
@@ -127,7 +127,7 @@ public class POI extends View {
         textPaint.setColor(Color.WHITE);
         textPaint.setAntiAlias(true);
         textPaint.setFakeBoldText(true);
-        textPaint.setTextSize(15);
+        textPaint.setTextSize(12);
         Rect rect = new Rect();
         //Obtenemos la frontera del texto a la derecha e izquierda para poder posicionarlo
         //centrado respecto al círculo.
@@ -135,6 +135,7 @@ public class POI extends View {
         leftTextBound = rect.left - BOUND_TOLERANCE;
         rightTextBound = rect.right + BOUND_TOLERANCE;
         textLengthHalf = (Math.abs(rightTextBound - leftTextBound) / 2) + (BOUND_TOLERANCE*2);
+        Log.d("textLengthHalf", "textLengthHalf: " + textLengthHalf + ", name: "+this.name +",nameDraw1: "+nameDraw1);
     }
 
     public void updateValues() {
@@ -219,7 +220,7 @@ public class POI extends View {
             Log.d("gps2", "inc " + name + ": " + inclination);
         } else {
             // TODO: Checar si no es mucho
-            inclination = 1;
+            inclination = 0;
         }
     }
 

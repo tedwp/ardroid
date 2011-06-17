@@ -12,8 +12,10 @@ import android.util.Log;
 public class SensorOptimalFilter {
 
     private static float direction;
+    private static float directionA;
     private static float directionB;
     private static float prevDirection = 0;
+    private static float prevDirectionA = 0;
     private static float prevDirectionB = 0;
 
     private static float inclination;
@@ -40,6 +42,22 @@ public class SensorOptimalFilter {
 
     public static float filterDirection(float dir) {
         directionChanged = false;
+
+        if (dir < 270 && dir > 90) {
+            //Utilizamos direction
+            directionA = optimalFilter(dir, prevDirectionA, NOISE_MAX_AMPLITUDE_DIRECTION);
+            prevDirectionA = directionA;
+            direction = directionA;
+        } else {
+            //Utilizamos directionB
+            if (dir <= 180) {
+                dir = dir + 360;
+            }
+            directionB = optimalFilter(dir, prevDirectionB, NOISE_MAX_AMPLITUDE_DIRECTION);
+            prevDirectionB = directionB;
+            direction = directionB;
+        }
+/*
         direction = optimalFilter(dir, prevDirection, NOISE_MAX_AMPLITUDE_DIRECTION);
         //Log.d("filtro", "Dir: " + direction);
 
@@ -50,45 +68,43 @@ public class SensorOptimalFilter {
             directionB = direction;
         }
 
-        directionB = optimalFilter(directionB, prevDirectionB, NOISE_MAX_AMPLITUDE_DIRECTION);
+        //directionB = optimalFilter(directionB, prevDirectionB, NOISE_MAX_AMPLITUDE_DIRECTION);
 
-        //if (changeAboveThreshold(prevDirection, direction, DIRECTION_THRESHOLD)) {
-//            directionChanged = true;
-//            prevDirection = direction;
-//            prevDirectionB = directionB;
-        //}
+
 
         directionChanged = true;
         prevDirection = direction;
         prevDirectionB = directionB;
 
-        /**
+        *//**
          * Si la dirección es menor que 90 o mayor que 270 regresamos el valor del segundo filtro.
          * Le restamos 360 antes de regresar el valor para que sea consistente, pero en su arreglo se
          * guarda antes de esta resta.
-         */
+         *//*
         if (direction < 90) {
             direction = directionB - 360;
         }
         if (direction > 270) {
             direction = directionB;
-        }
+        }*/
 
         if (direction < 0)
             direction += 360;
-        if (direction >= 360)
+        if (direction > 360)
             direction -= 360;
-
+        if (changeAboveThreshold(prevDirection, direction, DIRECTION_THRESHOLD)) {
+            directionChanged = true;
+        }
         return direction;
     }
 
     public static float filterInclination(float inc) {
         inclinationChanged = false;
         inclination = optimalFilter(inc, prevInclination, NOISE_MAX_AMPLITUDE_INCLINATION);
-        //if (changeAboveThreshold(prevInclination, inclination, INCLINATION_THRESHOLD)) {
-        inclinationChanged = true;
+        if (changeAboveThreshold(prevInclination, inclination, INCLINATION_THRESHOLD)) {
+            inclinationChanged = true;
+        }
         prevInclination = inclination;
-        //}
         return inclination;
     }
 
