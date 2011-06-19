@@ -236,6 +236,8 @@ public class ARLayer extends View {
     private float computeDirection() {
         float[] valores = new float[3];
         float[] matrizDeRotacion = new float[9];
+        //Log.d("180-1", "acel: " + valuesAccelerometer[0]+","+valuesAccelerometer[1]+","+valuesAccelerometer[2]);
+        //Log.d("180-2", "magn: " + valuesMagneticField[0]+","+valuesMagneticField[2]+","+valuesMagneticField[2]);
         SensorManager.getRotationMatrix(matrizDeRotacion, null,
                 valuesAccelerometer, valuesMagneticField);
 
@@ -251,7 +253,7 @@ public class ARLayer extends View {
         //Log.d("filter2", "Dir: " + direction);
         if (direction < 0) {
             direction = 360 + direction;
-        } else if (direction > 360) {
+        } else if (direction >= 360) {
             direction = direction - 360;
         }
         return direction;
@@ -310,19 +312,19 @@ public class ARLayer extends View {
                 inclination = SensorOptimalFilter.filterInclination(computeInclination(event.values[0], event.values[2]));
             }
             //Si cambio la dirección o la inclinación entonces debemos actualizar los POI
-            if (SensorOptimalFilter.directionChanged
-                    || SensorOptimalFilter.inclinationChanged || SensorAvgFilter.directionChanged || SensorAvgFilter.inclinationChanged) {
+            if (SensorOptimalFilter.directionChanged || SensorOptimalFilter.inclinationChanged) {
                 //Si cambio nuestra ubicación, la pasamos a updatePOILayout
-                if (locationChanged) {
-                    Log.d("gps", "Location changed, updating");
-                    updatePOILayout(currentLocation);
-                    locationChanged = false;
-                } else {
-                    updatePOILayout(null);
-                }
+//                if (locationChanged) {
+//                    Log.d("gps", "Location changed, updating");
+//                    updatePOILayout(currentLocation);
+//                    locationChanged = false;
+//                } else {
+//                    updatePOILayout(null);
+//                }
                 //Ponemos la dirección en la que está el dispositivo en el radar
-                Radar.setDirection(direction);
+//                Radar.setDirection(direction);
                 //Con esta llamada se redibujan todos los elementos de la pantalla
+                //Log.d("directionChanging", "1dir: " + direction);
                 postInvalidate();
             }
 
@@ -474,6 +476,7 @@ public class ARLayer extends View {
      * @param location Ubicación del dispositivo
      */
     private void updatePOILayout(Location location) {
+        //Log.d("orden", "1update1");
         if (location != null) {
             updatePOILocation(location);
         }
@@ -495,6 +498,7 @@ public class ARLayer extends View {
                 ++i;
             }
         }
+        //Log.d("orden", "2update2");
     }
 
     /**
@@ -505,12 +509,24 @@ public class ARLayer extends View {
      */
     @Override
     protected void onDraw(Canvas canvas) {
+
+        if (locationChanged) {
+            Log.d("gps", "Location changed, updating");
+            updatePOILayout(currentLocation);
+            locationChanged = false;
+        } else {
+            updatePOILayout(null);
+        }
+        Radar.setDirection(direction);
+        //Log.d("orden", "3draw1");
+        //Log.d("directionChanging", "2dir: " + direction);
         for (POI poi : poiList) {
             if (poi.isVisibleInRange() && poi.isVisibleFromCollisions()) {
                 poi.draw(canvas);
             }
         }
         super.onDraw(canvas);
+        //Log.d("orden", "4draw2");
     }
 
     /**
@@ -548,7 +564,7 @@ public class ARLayer extends View {
             Log.d("poiData", "Comenzando a bajar los POI");
             POISource geo = new GeoNamesPOISource();
             //TODO: QUitar este comentario
-            //geo.retrievePOIs(latitude, longitude);
+            geo.retrievePOIs(latitude, longitude);
             //}
             if (preferences.getBoolean("PREF_PI_SOURCE_TWITTER", false)) {
                 POISource twitter = new TwitterPOISource();

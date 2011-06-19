@@ -42,7 +42,10 @@ public class SensorOptimalFilter {
 
     public static float filterDirection(float dir) {
         directionChanged = false;
-
+//        Log.d("directionChanging2", "dir: " + dir);
+//        if (dir == 180.0f) {
+//            return prevDirection;
+//        }
         if (dir < 270 && dir > 90) {
             //Utilizamos direction
             directionA = optimalFilter(dir, prevDirectionA, NOISE_MAX_AMPLITUDE_DIRECTION);
@@ -95,6 +98,7 @@ public class SensorOptimalFilter {
         if (changeAboveThreshold(prevDirection, direction, DIRECTION_THRESHOLD)) {
             directionChanged = true;
         }
+        prevDirection = direction;
         return direction;
     }
 
@@ -121,6 +125,7 @@ public class SensorOptimalFilter {
      *         <code>val2</code> es mayor que <code>threshold</code>
      */
     private static boolean changeAboveThreshold(float val1, float val2, float threshold) {
+        //Log.d("threshold", "f1: " + val1 + ", f2: " + val2 + ", th: " + threshold + ", ch? " + (Math.abs(val1 - val2) >= threshold));
         return Math.abs(val1 - val2) >= threshold;
     }
 }

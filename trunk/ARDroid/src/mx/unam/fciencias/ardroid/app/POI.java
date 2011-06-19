@@ -135,7 +135,7 @@ public class POI extends View {
         leftTextBound = rect.left - BOUND_TOLERANCE;
         rightTextBound = rect.right + BOUND_TOLERANCE;
         textLengthHalf = (Math.abs(rightTextBound - leftTextBound) / 2) + (BOUND_TOLERANCE*2);
-        Log.d("textLengthHalf", "textLengthHalf: " + textLengthHalf + ", name: "+this.name +",nameDraw1: "+nameDraw1);
+        //Log.d("textLengthHalf", "textLengthHalf: " + textLengthHalf + ", name: "+this.name +",nameDraw1: "+nameDraw1);
     }
 
     public void updateValues() {
@@ -146,7 +146,7 @@ public class POI extends View {
             }
             distance = POI.deviceLocation.distanceTo(poiLocation);
             updateVisibilityInRange();
-            Log.d("rang", name + " " + isVisibleInRange);
+            //Log.d("rang", name + " " + isVisibleInRange);
             setInclination();
         }
     }
