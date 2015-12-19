@@ -1,0 +1,1 @@
+Augmented Reallity app for Android with multiple Points of Interest Sources, and collision detection.
